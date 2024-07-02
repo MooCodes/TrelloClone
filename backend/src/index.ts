@@ -4,6 +4,7 @@ import connectDB from "./config/db";
 import http from "http";
 import { Server } from "socket.io";
 import userRouter from "./routes/userRoutes";
+import boardRouter from "./routes/boardRoutes";
 
 const app = express();
 const server = http.createServer(app);
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(cors());
 
 app.use("/api/users", userRouter);
+app.use("/api/boards", boardRouter);
 
 app.get("/", (_req, res) => {
   res.send("API Running");

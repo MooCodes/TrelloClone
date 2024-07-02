@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import User from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { AuthRequest } from "../middleware/auth";
 
 export const createUser = async (req: Request, res: Response) => {
   try {
