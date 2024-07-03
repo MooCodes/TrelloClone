@@ -23,7 +23,7 @@ const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   } catch (error) {
     res
       .status(401)
-      .send({ error: "Authentication failed. Please authenticate" });
+      .send({ error: "Unauthorized" });
   }
 };
 

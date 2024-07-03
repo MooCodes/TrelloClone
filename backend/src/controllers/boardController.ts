@@ -1,7 +1,9 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import Board from "../models/Board";
 import { AuthRequest } from "../middleware/auth";
 import User from "../models/User";
+import List from "../models/List";
+import Card from "../models/Card";
 import { ObjectId } from "mongoose";
 
 export const createBoard = async (req: AuthRequest, res: Response) => {
@@ -119,6 +121,45 @@ export const updateBoard = async (req: AuthRequest, res: Response) => {
     );
 
     res.status(200).json(updatedBoard);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const deleteBoard = async (req: AuthRequest, res: Response) => {
+  const boardId = req.params.boardId;
+
+  try {
+    const board = await Board.findById(boardId);
+
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+
+    if (board.owner.toString() !== (req.user?._id as string).toString()) {
+      return res.status(401).json({
+        message: "Unauthorized: Only the board owner can delete the board",
+      });
+    }
+
+    // update user boards to remove the board
+    await User.updateMany(
+      { boards: board._id },
+      { $pull: { boards: board._id } }
+    );
+
+    // delete all lists associated with the board
+    await List.deleteMany({ board: boardId });
+
+    // delete all cards associated with the board
+    await Card.deleteMany({ list: { $in: board.lists } });
+
+    // finally delete the board
+    await Board.findByIdAndDelete(boardId);
+
+    res.status(200).json({ message: "Board deleted successfully" });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });

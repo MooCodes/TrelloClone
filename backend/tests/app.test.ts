@@ -3,10 +3,11 @@ import app from "../src/app";
 import request from "supertest";
 import User from "../src/models/User";
 
-describe("GET /", () => {
+describe("GET / and POST /users", () => {
   beforeEach(async () => {
     await User.deleteMany({});
   });
+
   it("should return 200", async () => {
     const response = await request(app).get("/");
     expect(response.status).toBe(200);
@@ -33,9 +34,7 @@ describe("GET /", () => {
     expect(createdUser?.email).toBe("test");
   });
 
-
   afterAll(async () => {
-    console.log("yo");
     await mongoose.connection.close();
   });
 });
