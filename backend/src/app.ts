@@ -5,6 +5,7 @@ import http from "http";
 import { Server } from "socket.io";
 import userRouter from "./routes/userRoutes";
 import boardRouter from "./routes/boardRoutes";
+import listRouter from "./routes/listRoutes";
 
 const app = express();
 const server = http.createServer(app);
@@ -25,6 +26,7 @@ app.use(cors());
 
 app.use("/api/users", userRouter);
 app.use("/api/boards", boardRouter);
+app.use("/api/lists", listRouter)
 
 app.get("/", (_req, res) => {
   res.send("API Running");

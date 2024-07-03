@@ -1,16 +1,15 @@
 import mongoose, { ObjectId } from "mongoose";
 import app from "../src/app";
 import request from "supertest";
-import User from "../src/models/User";
+import User, { IUser } from "../src/models/User";
 import Board from "../src/models/Board";
 import jwt from "jsonwebtoken";
-import exp from "constants";
 import List from "../src/models/List";
 import Card from "../src/models/Card";
 
 const api = request(app);
 
-const createUser = async (
+export const createUser = async (
   username: string,
   email: string,
   password: string
@@ -27,12 +26,20 @@ const createUser = async (
   return { user, token };
 };
 
-describe("Board API", () => {
+describe("Board Controller", () => {
+  let user: IUser;
+  let token: string;
+
   beforeEach(async () => {
     await User.deleteMany({});
     await Board.deleteMany({});
     await List.deleteMany({});
     await Card.deleteMany({});
+
+    const userData = await createUser("test", "test", "test");
+
+    user = userData.user;
+    token = userData.token;
   });
 
   afterAll(async () => {
@@ -41,8 +48,6 @@ describe("Board API", () => {
 
   describe("createBoard", () => {
     it("should create a new board", async () => {
-      const { user, token } = await createUser("test", "test", "test");
-
       // create a new board
       const response = await api
         .post("/api/boards")
@@ -76,8 +81,6 @@ describe("Board API", () => {
     });
 
     it("should add user to board and assign board to user", async () => {
-      const { user, token } = await createUser("test", "test", "test");
-
       // create a new board
       const response = await api
         .post("/api/boards")
@@ -99,7 +102,6 @@ describe("Board API", () => {
 
   describe("getBoards", () => {
     it("should return all boards for a user", async () => {
-      const { user, token } = await createUser("test", "test", "test");
       // create a new board
       await api
         .post("/api/boards")
@@ -128,11 +130,6 @@ describe("Board API", () => {
     });
 
     it("should return all boards for a user that they are a member of", async () => {
-      const { user: user1, token: token1 } = await createUser(
-        "test",
-        "test",
-        "test"
-      );
       const { user: user2, token: token2 } = await createUser(
         "test2",
         "test2",
@@ -141,7 +138,7 @@ describe("Board API", () => {
 
       const response = await api
         .post("/api/boards")
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test board",
           description: "test board",
@@ -149,7 +146,7 @@ describe("Board API", () => {
 
       await api
         .post(`/api/boards/${response.body._id}/addUser`)
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           emailToAdd: user2.email,
         });
@@ -166,11 +163,6 @@ describe("Board API", () => {
 
   describe("addUserToBoard", () => {
     it("should add another user to board", async () => {
-      const { user: user1, token: token1 } = await createUser(
-        "test",
-        "test",
-        "test"
-      );
       const { user: user2, token: token2 } = await createUser(
         "test2",
         "test2",
@@ -179,7 +171,7 @@ describe("Board API", () => {
 
       const response = await api
         .post("/api/boards")
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
           description: "test",
@@ -189,7 +181,7 @@ describe("Board API", () => {
       // add user to board
       await api
         .post(`/api/boards/${response.body._id}/addUser`)
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           emailToAdd: user2.email,
         });
@@ -202,11 +194,6 @@ describe("Board API", () => {
     });
 
     it("should not add a new user to board if user is not owner of board", async () => {
-      const { user: user1, token: token1 } = await createUser(
-        "test",
-        "test",
-        "test"
-      );
       const { user: user2, token: token2 } = await createUser(
         "test2",
         "test2",
@@ -215,7 +202,7 @@ describe("Board API", () => {
 
       const response = await api
         .post("/api/boards")
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
           description: "test",
@@ -237,12 +224,6 @@ describe("Board API", () => {
     });
 
     it("should not add a user to the board if the user already exists in the board", async () => {
-      const { user: user1, token: token1 } = await createUser(
-        "test",
-        "test",
-        "test"
-      );
-
       const { user: user2, token: token2 } = await createUser(
         "test2",
         "test2",
@@ -251,7 +232,7 @@ describe("Board API", () => {
 
       const response = await api
         .post("/api/boards")
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
           description: "test",
@@ -261,14 +242,14 @@ describe("Board API", () => {
       // add user to board
       await api
         .post(`/api/boards/${response.body._id}/addUser`)
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           emailToAdd: user2.email,
         });
 
       const response2 = await api
         .post(`/api/boards/${response.body._id}/addUser`)
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           emailToAdd: user2.email,
         })
@@ -282,7 +263,6 @@ describe("Board API", () => {
 
   describe("updateBoard", () => {
     it("should update a board", async () => {
-      const { user, token } = await createUser("test", "test", "test");
       const response = await api
         .post("/api/boards")
         .set("Authorization", `Bearer ${token}`)
@@ -312,7 +292,6 @@ describe("Board API", () => {
 
   describe("deleteBoard", () => {
     it("should delete a board", async () => {
-      const { user, token } = await createUser("test", "test", "test");
       const response = await api
         .post("/api/boards")
         .set("Authorization", `Bearer ${token}`)
@@ -337,11 +316,6 @@ describe("Board API", () => {
     });
 
     it("should not delete a board if the user is not the owner", async () => {
-      const { user: user1, token: token1 } = await createUser(
-        "test",
-        "test",
-        "test"
-      );
       const { user: user2, token: token2 } = await createUser(
         "test2",
         "test2",
@@ -350,7 +324,7 @@ describe("Board API", () => {
 
       const response = await api
         .post("/api/boards")
-        .set("Authorization", `Bearer ${token1}`)
+        .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
           description: "test",
@@ -367,7 +341,6 @@ describe("Board API", () => {
     });
 
     it("should delete a board and its associated lists and cards", async () => {
-      const { user, token } = await createUser("test", "test", "test");
       const response = await api
         .post("/api/boards")
         .set("Authorization", `Bearer ${token}`)
@@ -401,9 +374,11 @@ describe("Board API", () => {
       await list2.save();
 
       // update the board with the lists and cards with mongoose
-      await Board.findByIdAndUpdate(boardId, {
-        lists: [list1._id, list2._id],
-      });
+      const updatedBoard = await Board.findByIdAndUpdate(
+        boardId,
+        { lists: [list1._id, list2._id] },
+        { new: true }
+      );
 
       await api
         .delete(`/api/boards/${boardId}`)
@@ -427,7 +402,7 @@ describe("Board API", () => {
 
       const updatedUser = await User.findById(user._id);
       // check if the board was deleted from the user's boards
-      expect(updatedUser?.boards.length).toBe(0);
+      expect(updatedUser?.boards).not.toContainEqual(updatedBoard?._id);
     });
   });
 });
