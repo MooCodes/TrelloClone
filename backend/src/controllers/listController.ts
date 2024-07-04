@@ -63,7 +63,8 @@ export const getLists = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const lists = await List.find({ board: boardId });
+    // get lists and populate cards
+    const lists = await List.find({ board: boardId }).populate("cards");
 
     if (!lists) {
       return res.status(404).json({ message: "Lists not found" });

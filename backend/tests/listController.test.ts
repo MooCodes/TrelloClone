@@ -53,6 +53,17 @@ describe("List Controller", () => {
       const list = await List.findById(listResponse.body._id);
       expect(list).not.toBeNull();
 
+      // create a card in the list
+      await api
+        .post(`/api/cards/${listResponse.body._id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send({
+          title: "testCard",
+          description: "testCard",
+        })
+        .expect(201);
+
+
       // get all lists for the board
       const res2 = await api
         .get(`/api/lists/${boardResponse.body._id}`)
@@ -60,6 +71,8 @@ describe("List Controller", () => {
         .expect(200);
 
       expect(res2.body.length).toBe(1);
+      expect(res2.body[0]._id).toEqual(listResponse.body._id);
+      expect(res2.body[0].cards.length).toBe(1);
     });
   });
 
