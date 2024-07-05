@@ -39,7 +39,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -58,7 +57,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "testCard",
-          description: "testCard",
         })
         .expect(201);
 
@@ -77,7 +75,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -121,7 +118,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -170,7 +166,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -206,7 +201,7 @@ describe("Card Controller", () => {
         .delete(`/api/cards/${res.body._id}`)
         .set("Authorization", `Bearer ${token}`)
         .expect(200);
-      
+
       const deletedCard = await Card.findById(res.body._id);
       expect(deletedCard).toBeNull();
 

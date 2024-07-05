@@ -39,7 +39,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -61,10 +60,8 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "testCard",
-          description: "testCard",
         })
         .expect(201);
-
 
       // get all lists for the board
       const res2 = await api
@@ -86,7 +83,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -116,7 +112,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -156,7 +151,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -202,7 +196,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -240,7 +233,6 @@ describe("List Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 

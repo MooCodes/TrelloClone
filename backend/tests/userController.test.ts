@@ -7,7 +7,6 @@ import connectDB from "../src/config/db";
 const api = request(app);
 
 describe("User Controller", () => {
-
   beforeEach(async () => {
     await connectDB();
     await User.deleteMany({});

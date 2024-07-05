@@ -8,10 +8,9 @@ import { ObjectId } from "mongoose";
 
 export const createBoard = async (req: AuthRequest, res: Response) => {
   try {
-    const { name, description } = req.body;
+    const { name } = req.body;
     const newBoard = new Board({
       name,
-      description,
       owner: req.user?._id,
       members: [req.user?._id],
     });
@@ -99,7 +98,7 @@ export const addUserToBoard = async (req: AuthRequest, res: Response) => {
 
 export const updateBoard = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
-  const { name, description } = req.body;
+  const { name } = req.body;
 
   try {
     const board = await Board.findById(boardId);
@@ -116,7 +115,7 @@ export const updateBoard = async (req: AuthRequest, res: Response) => {
 
     const updatedBoard = await Board.findByIdAndUpdate(
       boardId,
-      { name, description },
+      { name },
       { new: true }
     );
 

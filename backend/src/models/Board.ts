@@ -2,7 +2,6 @@ import { Schema, model, Document } from "mongoose";
 
 export interface IBoard extends Document {
   name: string;
-  description?: string;
   owner: Schema.Types.ObjectId;
   members: Schema.Types.ObjectId[];
   lists: Schema.Types.ObjectId[];
@@ -10,7 +9,6 @@ export interface IBoard extends Document {
 
 const boardSchema = new Schema<IBoard>({
   name: { type: String, required: true },
-  description: { type: String },
   owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   lists: [{ type: Schema.Types.ObjectId, ref: "List" }],

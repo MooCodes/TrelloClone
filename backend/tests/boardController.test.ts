@@ -56,14 +56,12 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
       const board = await Board.findById(response.body._id);
       expect(board).toBeDefined();
       expect(board?.name).toBe("test");
-      expect(board?.description).toBe("test");
       expect(board?.owner.toString()).toBe(user._id?.toString());
       expect(board?.members).toEqual([user._id]);
     });
@@ -73,7 +71,6 @@ describe("Board Controller", () => {
         .post("/api/boards")
         .send({
           name: "test",
-          description: "test",
         })
         .expect(401);
 
@@ -89,7 +86,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         });
 
       const createdBoard = await Board.findById(response.body._id);
@@ -110,7 +106,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         });
 
       await api
@@ -118,7 +113,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test2",
-          description: "test2",
         });
 
       const response = await api
@@ -143,7 +137,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test board",
-          description: "test board",
         });
 
       await api
@@ -176,7 +169,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -207,7 +199,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -237,7 +228,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -270,7 +260,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -279,13 +268,11 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test2",
-          description: "test2",
         })
         .expect(200);
 
       const updatedBoard = await Board.findById(response.body._id);
       expect(updatedBoard?.name).toBe("test2");
-      expect(updatedBoard?.description).toBe("test2");
 
       const updatedUser = await User.findById(user._id);
       expect(updatedUser?.boards).toContainEqual(updatedBoard?._id);
@@ -299,7 +286,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -329,7 +315,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 
@@ -348,7 +333,6 @@ describe("Board Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           name: "test",
-          description: "test",
         })
         .expect(201);
 

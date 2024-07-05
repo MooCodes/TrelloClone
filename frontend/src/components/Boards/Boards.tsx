@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import axios from "axios";
+import { BoardsContainer } from "./Boards.styles";
+import Board, { IBoard } from "../Board/Board";
 
 const token = localStorage.getItem("trello-clone-token");
 
-const Board = () => {
+const Boards = () => {
   // TODO: get all boards for this user
-  const { userId } = useParams();
   const [boards, setBoards] = useState([]);
 
   useEffect(() => {
@@ -22,13 +22,21 @@ const Board = () => {
         console.log(response.data);
       } catch (error) {
         console.error(error);
-      }  
-    }
-  
+      }
+    };
+
     fetchBoards();
   }, []);
 
-  return <div>Boards for {userId}</div>;
+  return (
+    <div>
+      <BoardsContainer>
+        {boards.map((board: IBoard) => (
+          <Board key={board._id} {...board} />
+        ))}
+      </BoardsContainer>
+    </div>
+  );
 };
 
-export default Board;
+export default Boards;
