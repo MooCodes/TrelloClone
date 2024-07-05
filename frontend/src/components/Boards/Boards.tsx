@@ -1,32 +1,33 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
 import { BoardsContainer } from "./Boards.styles";
 import Board, { IBoard } from "../Board/Board";
+import BoardForm from "../BoardForm/BoardForm";
+import { useQuery } from "@tanstack/react-query";
 
 const token = localStorage.getItem("trello-clone-token");
 
 const Boards = () => {
-  // TODO: get all boards for this user
-  const [boards, setBoards] = useState([]);
+  const query = useQuery({
+    queryKey: ["boards"],
+    queryFn: async () => {
+      const response = await axios.get(`http://localhost:5000/api/boards`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return response.data;
+    },
+  });
 
-  useEffect(() => {
-    const fetchBoards = async () => {
-      console.log(token);
-      try {
-        const response = await axios.get(`http://localhost:5000/api/boards`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setBoards(response.data);
-        console.log(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
+  if (query.isLoading) {
+    return <div>Loading...</div>;
+  }
 
-    fetchBoards();
-  }, []);
+  if (query.isError) {
+    return <div>Error</div>;
+  }
+
+  const { data: boards } = query;
 
   return (
     <div>
@@ -34,6 +35,7 @@ const Boards = () => {
         {boards.map((board: IBoard) => (
           <Board key={board._id} {...board} />
         ))}
+        <BoardForm></BoardForm>
       </BoardsContainer>
     </div>
   );

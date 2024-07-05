@@ -8,11 +8,14 @@ export interface IBoard {
 
 const Board = ({ _id, name }: IBoard) => {
   const navigate = useNavigate();
+
   return (
     <BoardContainer onClick={() => navigate(`/boards/${_id}`)}>
       <BoardHeader>
         <BoardTitle>{name}</BoardTitle>
       </BoardHeader>
+      <div style={{ position: "absolute", bottom: "10px", right: "10px" }}>
+      </div>
     </BoardContainer>
   );
 };

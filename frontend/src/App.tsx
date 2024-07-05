@@ -3,6 +3,7 @@ import { createGlobalStyle } from "styled-components";
 import LoginForm from "./components/LoginForm/LoginForm";
 import Boards from "./components/Boards/Boards";
 import "@fontsource/roboto";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -16,9 +17,11 @@ const GlobalStyles = createGlobalStyle`
   }
 `;
 
+const queryClient = new QueryClient();
+
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <GlobalStyles />
       <Router>
         <Routes>
@@ -26,7 +29,7 @@ function App() {
           <Route path="/boards" element={<Boards />} />
         </Routes>
       </Router>
-    </>
+    </QueryClientProvider>
   );
 }
 
