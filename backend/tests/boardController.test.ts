@@ -6,6 +6,7 @@ import Board from "../src/models/Board";
 import jwt from "jsonwebtoken";
 import List from "../src/models/List";
 import Card from "../src/models/Card";
+import connectDB from "../src/config/db";
 
 const api = request(app);
 
@@ -31,6 +32,7 @@ describe("Board Controller", () => {
   let token: string;
 
   beforeEach(async () => {
+    await connectDB();
     await User.deleteMany({});
     await Board.deleteMany({});
     await List.deleteMany({});

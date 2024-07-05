@@ -17,6 +17,14 @@ connectDB();
 io.on("connection", (socket) => {
   console.log("a user connected");
 
+  socket.on("joinBoard", (boardId) => {
+    socket.join(boardId);
+  });
+
+  socket.on("addList", (list) => {
+    socket.to(list.board._id).emit("listAdded", list);
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected");
   });
@@ -29,9 +37,5 @@ app.use("/api/users", userRouter);
 app.use("/api/boards", boardRouter);
 app.use("/api/lists", listRouter);
 app.use("/api/cards", cardRouter);
-
-app.get("/", (_req, res) => {
-  res.send("API Running");
-});
 
 export default app;

@@ -132,8 +132,6 @@ export const deleteList = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    console.log("deleting");
-
     // delete all cards associated with the list
     await Card.deleteMany({ list: listId });
 

@@ -6,6 +6,7 @@ import List from "../src/models/List";
 import Board from "../src/models/Board";
 import User, { IUser } from "../src/models/User";
 import { createUser } from "./boardController.test";
+import connectDB from "../src/config/db";
 
 const api = request(app);
 
@@ -14,6 +15,7 @@ describe("Card Controller", () => {
   let token: string;
 
   beforeEach(async () => {
+    await connectDB();
     await User.deleteMany({});
     await Board.deleteMany({});
     await List.deleteMany({});
