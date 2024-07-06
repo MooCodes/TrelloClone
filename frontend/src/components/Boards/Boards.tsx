@@ -4,9 +4,8 @@ import Board, { IBoard } from "../Board/Board";
 import BoardForm from "../BoardForm/BoardForm";
 import { useQuery } from "@tanstack/react-query";
 
-const token = localStorage.getItem("trello-clone-token");
-
 const Boards = () => {
+  const token = localStorage.getItem("trello-clone-token");
   const query = useQuery({
     queryKey: ["boards"],
     queryFn: async () => {
