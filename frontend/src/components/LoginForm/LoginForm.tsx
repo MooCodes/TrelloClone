@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FormContainer, Form, Input, Button } from "./LoginForm.styles";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import LoginService from "../../services/login";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -13,18 +13,15 @@ const LoginForm = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/users/login",
-        {
-          username,
-          email,
-          password,
-        }
-      );
+      const response = await LoginService.login({
+        email,
+        password,
+      })
 
-      console.log(response.data);
+      const { token } = response;
 
-      localStorage.setItem("trello-clone-token", response.data.token);
+      LoginService.setToken(token);
+
       navigate(`/boards`);
     } catch (error) {
       console.error(error);

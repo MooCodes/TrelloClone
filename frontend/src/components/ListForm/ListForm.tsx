@@ -18,9 +18,8 @@ interface IListsAndBoard {
   lists: IList[];
 }
 
-const token = localStorage.getItem("trello-clone-token");
-
 const ListForm = ({ boardId }: IListFormProps) => {
+  const token = localStorage.getItem("trello-clone-token");
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
 
@@ -37,7 +36,10 @@ const ListForm = ({ boardId }: IListFormProps) => {
       );
     },
     onSuccess: ({ data }) => {
-      const listsAndBoard = queryClient.getQueryData(["listsAndBoard", boardId]) as IListsAndBoard;
+      const listsAndBoard = queryClient.getQueryData([
+        "listsAndBoard",
+        boardId,
+      ]) as IListsAndBoard;
       console.log("data", data);
       console.log("listsAndBoard", listsAndBoard);
 

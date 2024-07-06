@@ -6,10 +6,9 @@ import { IBoard } from "../Board/Board";
 import { ListsContainer, BoardName } from "./Lists.styles";
 import ListForm from "../ListForm/ListForm";
 
-const token = localStorage.getItem("trello-clone-token");
-
 const Lists = () => {
   const { boardId } = useParams();
+  const token = localStorage.getItem("trello-clone-token");
 
   const query = useQuery({
     queryKey: ["listsAndBoard", boardId],
@@ -44,14 +43,20 @@ const Lists = () => {
 
   const { board, lists } = query.data as { board: IBoard; lists: IList[] };
 
-  console.log(board, lists);
+  console.log("board", board);
+  console.log("lists", lists);
 
   return (
     <>
       <BoardName>{board.name}</BoardName>
       <ListsContainer>
         {lists.map((list: IList) => (
-          <List key={list._id} title={list.title} />
+          <List
+            key={list._id}
+            _id={list._id}
+            title={list.title}
+            cards={list.cards}
+          />
         ))}
         <ListForm boardId={board._id} />
       </ListsContainer>

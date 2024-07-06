@@ -8,7 +8,7 @@ interface ICard extends Document {
 
 const cardSchema = new Schema<ICard>({
   title: { type: String, required: true },
-  description: { type: String, required: true },
+  description: { type: String },
   list: { type: Schema.Types.ObjectId, ref: "List", required: true },
 });
 
