@@ -48,6 +48,21 @@ export const getBoards = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const getBoard = async (req: AuthRequest, res: Response) => {
+  const boardId = req.params.boardId;
+  try {
+    const board = await Board.findById(boardId);
+    if (!board) {
+      return res.status(404).json({ message: "Board not found" });
+    }
+    res.status(200).json(board);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
 export const addUserToBoard = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
   const userEmailToAdd = req.body.emailToAdd;

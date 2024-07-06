@@ -3,7 +3,6 @@ import {
   BoardFormContainer,
   BoardTitleInput,
   BoardAddButton,
-  BoardTitleText,
 } from "./BoardForm.styles";
 import axios from "axios";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
@@ -43,8 +42,8 @@ const BoardForm = () => {
   return (
     <>
       <BoardFormContainer onSubmit={handleSubmit}>
-        <BoardTitleText>Board title*</BoardTitleText>
         <BoardTitleInput
+          placeholder="Enter board title..."
           value={name}
           onChange={(e) => setName(e.target.value)}
         />

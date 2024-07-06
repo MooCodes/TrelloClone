@@ -1,11 +1,11 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-export const BoardFormContainer = styled.form`
+export const ListFormContainer = styled.form`
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background-color: #fff;
   border: 1px solid #ddd;
-  border-radius: 3px;
+  border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 10px;
   width: 250px;
@@ -18,8 +18,7 @@ export const BoardFormContainer = styled.form`
   }
 `;
 
-
-export const BoardTitleInput = styled.input`
+export const ListTitleInput = styled.input`
   width: 100%;
   font-size: 18px;
   font-weight: bold;
@@ -27,14 +26,14 @@ export const BoardTitleInput = styled.input`
   margin: 0;
 `;
 
-export const BoardAddButton = styled.button`
+export const ListFormButton = styled.button`
   align-self: flex-start;
   background-color: #007bff;
-  color: white;
-  font-size: 16px;
-  margin-top: 10px;
-  padding: 8px;
+  color: #fff;
   border: none;
   border-radius: 4px;
+  padding: 8px;
+  font-size: 16px;
   cursor: pointer;
-`;
+  margin-top: 10px;
+`
