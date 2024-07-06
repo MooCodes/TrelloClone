@@ -9,10 +9,9 @@ export const createUser = async (req: Request, res: Response) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({ username, email, password: hashedPassword });
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET!);
 
-    await user.save();
-    res.status(201).json({ user, token });
+    const savedUser = await user.save();
+    res.status(201).json(savedUser);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -35,7 +34,12 @@ export const loginUser = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET!);
+    const userForToken = {
+      email: user.email,
+      id: user._id,
+    }
+
+    const token = jwt.sign(userForToken, process.env.JWT_SECRET!);
 
     res.status(200).json({ user, token });
   } catch (error) {

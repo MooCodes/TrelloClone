@@ -93,7 +93,6 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "testCard",
-          description: "testCard",
         })
         .expect(201);
 
@@ -136,25 +135,21 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "testCard",
-          description: "testCard",
         })
         .expect(201);
 
       const card = await Card.findById(res.body._id);
       expect(card).not.toBeNull();
       expect(card?.title).toBe("testCard");
-      expect(card?.description).toBe("testCard");
 
       const updatedCard = await api
         .put(`/api/cards/${res.body._id}`)
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "updatedCard",
-          description: "updatedCard",
         })
         .expect(200);
       expect(updatedCard.body.title).toBe("updatedCard");
-      expect(updatedCard.body.description).toBe("updatedCard");
     });
   });
 
@@ -184,14 +179,12 @@ describe("Card Controller", () => {
         .set("Authorization", `Bearer ${token}`)
         .send({
           title: "testCard",
-          description: "testCard",
         })
         .expect(201);
 
       const card = await Card.findById(res.body._id);
       expect(card).not.toBeNull();
       expect(card?.title).toBe("testCard");
-      expect(card?.description).toBe("testCard");
 
       let list = await List.findById(listResponse.body._id).populate("cards");
       expect(list).not.toBeNull();

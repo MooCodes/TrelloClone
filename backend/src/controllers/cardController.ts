@@ -1,14 +1,13 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import Card from "../models/Card";
 import List from "../models/List";
 import Board from "../models/Board";
 import { AuthRequest } from "../middleware/auth";
 import { ObjectId } from "mongoose";
-import User from "../models/User";
 
 export const createCard = async (req: AuthRequest, res: Response) => {
   const listId = req.params.listId;
-  const { title, description } = req.body;
+  const { title } = req.body;
 
   try {
     const list = await List.findById(listId);
@@ -31,7 +30,6 @@ export const createCard = async (req: AuthRequest, res: Response) => {
 
     const newCard = new Card({
       title,
-      description,
       list: list._id,
     });
 
@@ -88,7 +86,7 @@ export const getCards = async (req: AuthRequest, res: Response) => {
 
 export const updateCard = async (req: AuthRequest, res: Response) => {
   const cardId = req.params.cardId;
-  const { title, description } = req.body;
+  const { title } = req.body;
   try {
     const card = await Card.findById(cardId);
 
@@ -117,10 +115,7 @@ export const updateCard = async (req: AuthRequest, res: Response) => {
     // update the card
     const updatedCard = await Card.findByIdAndUpdate(
       cardId,
-      {
-        title,
-        description,
-      },
+      { title },
       { new: true }
     );
 
@@ -163,7 +158,7 @@ export const deleteCard = async (req: AuthRequest, res: Response) => {
     await List.findByIdAndUpdate(list._id, {
       $pull: { cards: cardId },
     });
-    
+
     // finally delete the card
     await Card.findByIdAndDelete(cardId);
 

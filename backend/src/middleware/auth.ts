@@ -10,9 +10,12 @@ const auth = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const token = req.header("Authorization")?.replace("Bearer ", "");
     const decoded = jwt.verify(token!, process.env.JWT_SECRET!) as {
-      _id: string;
+      email: string;
     };
-    const user = await User.findOne({ _id: decoded._id });
+
+    const user = await User.findOne({ email: decoded.email });
+
+    console.log(user);
 
     if (!user) {
       throw new Error();

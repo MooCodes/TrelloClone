@@ -20,6 +20,8 @@ const LoginForm = () => {
 
       const { token } = response;
 
+      console.log(token);
+
       LoginService.setToken(token);
 
       navigate(`/boards`);

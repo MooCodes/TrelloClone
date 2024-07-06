@@ -50,12 +50,13 @@ const ListForm = ({ boardId }: IListFormProps) => {
       };
 
       queryClient.setQueryData(["listsAndBoard", boardId], newListsAndBoard);
+
+      setTitle("");
     },
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     mutation.mutate();
   };
 

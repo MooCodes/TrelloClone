@@ -343,12 +343,10 @@ describe("Board Controller", () => {
       const list2 = await List.create({ title: "List 2", board: boardId });
       const card1 = await Card.create({
         title: "Card 1",
-        description: "test",
         list: list1._id,
       });
       const card2 = await Card.create({
         title: "Card 2",
-        description: "test",
         list: list2._id,
       });
 
