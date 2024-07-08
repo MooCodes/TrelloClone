@@ -13,7 +13,6 @@ export const BoardContainer = styled.div`
   &:hover {
     background-color: #e9ecef;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-color: #007bff;
   }
 `;
 

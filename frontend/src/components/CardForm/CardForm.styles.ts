@@ -6,21 +6,27 @@ export const CardFormContainer = styled.form`
 `;
 
 export const CardTitleContainer = styled.div`
-  background-color: #e9ecef;
+  background-color: #22272b;
   border-radius: 10px;
   padding: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+
 `;
 
 export const CardTitleInput = styled.input`
+  background-color: #22272b;
+  border: none;
   font-size: 16px;
   font-weight: bold;
-  color: #333;
+  color: #b6c2cf;
   margin: 0;
   width: 100%;
+
+  &:focus {
+    outline: none;
+  }
 `;
 
 export const CardButton = styled.button`
@@ -33,4 +39,4 @@ export const CardButton = styled.button`
   font-size: 16px;
   cursor: pointer;
   margin-top: 10px;
-`
+`;

@@ -29,7 +29,7 @@ const List = ({ _id, title }: IList) => {
   });
 
   if (query.isLoading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (query.isError) {

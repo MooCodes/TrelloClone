@@ -19,7 +19,7 @@ const Boards = () => {
   });
 
   if (query.isLoading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (query.isError) {

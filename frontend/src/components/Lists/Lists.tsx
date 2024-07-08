@@ -3,7 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import List, { IList } from "../List/List";
 import { IBoard } from "../Board/Board";
-import { ListsContainer, BoardName } from "./Lists.styles";
+import {
+  BoardName,
+  ListsContainer,
+  ListsHeader,
+  ListsInviteButton,
+} from "./Lists.styles";
 import ListForm from "../ListForm/ListForm";
 
 const Lists = () => {
@@ -34,7 +39,7 @@ const Lists = () => {
   });
 
   if (query.isLoading) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   if (query.isError) {
@@ -47,8 +52,11 @@ const Lists = () => {
   console.log("lists", lists);
 
   return (
-    <>
-      <BoardName>{board.name}</BoardName>
+    <div unselectable="on" className="unselectable" style={{ backgroundColor: "#7B3123" }}>
+      <ListsHeader>
+        <BoardName>{board.name}</BoardName>
+        <ListsInviteButton>Invite</ListsInviteButton>
+      </ListsHeader>
       <ListsContainer>
         {lists.map((list: IList) => (
           <List
@@ -60,7 +68,7 @@ const Lists = () => {
         ))}
         <ListForm boardId={board._id} />
       </ListsContainer>
-    </>
+    </div>
   );
 };
 

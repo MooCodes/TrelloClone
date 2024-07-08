@@ -11,11 +11,25 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     font-family: 'Roboto';
   }
-  body {
+  body, html {
     margin: 0;
     padding: 0;
-    background-color: #0079bf;
+    background-color: #7B3123;
   }
+
+*.unselectable {
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+
+   /*
+     Introduced in Internet Explorer 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+   -ms-user-select: none;
+   user-select: none;
+  }
+
 `;
 
 const queryClient = new QueryClient();

@@ -5,8 +5,6 @@ export const FormContainer = styled.div`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 80vh;
-  background-color: #0079bf; /* Trello blue color */
 `;
 
 export const Form = styled.form`
@@ -18,7 +16,7 @@ export const Form = styled.form`
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 export const Input = styled.input`
