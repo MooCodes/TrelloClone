@@ -6,7 +6,6 @@ import {
 } from "./BoardForm.styles";
 import axios from "axios";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { IBoard } from "../Board/Board";
 
 const BoardForm = () => {
   const [name, setName] = useState("");
@@ -25,11 +24,11 @@ const BoardForm = () => {
         }
       );
     },
-    onSuccess: ({ data })=> {
+    onSuccess: ()=> {
       setName("");
-      const boards = queryClient.getQueryData(["boards"]) as IBoard[];
-      // append new board to the end of the list
-      queryClient.setQueryData(["boards"], [...boards, data]);
+      queryClient.invalidateQueries({
+        queryKey: ["boards"],
+      })
     },
   });
 

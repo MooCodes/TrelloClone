@@ -5,6 +5,6 @@ export const BoardsContainer = styled.div`
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  height: 80vh;
+  height: 50vh; 
   gap: 20px;
 `;

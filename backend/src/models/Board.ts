@@ -5,6 +5,7 @@ export interface IBoard extends Document {
   owner: Schema.Types.ObjectId;
   members: Schema.Types.ObjectId[];
   lists: Schema.Types.ObjectId[];
+  index: number;
 }
 
 const boardSchema = new Schema<IBoard>({
@@ -12,6 +13,7 @@ const boardSchema = new Schema<IBoard>({
   owner: { type: Schema.Types.ObjectId, ref: "User", required: true },
   members: [{ type: Schema.Types.ObjectId, ref: "User" }],
   lists: [{ type: Schema.Types.ObjectId, ref: "List" }],
+  index: { type: Number, required: true },
 });
 
 boardSchema.methods.toJSON = function () {
