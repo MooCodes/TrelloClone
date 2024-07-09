@@ -10,6 +10,7 @@ export const BoardContainer = styled.div`
   width: 250px;
   height: 100px;
   cursor: pointer;
+  margin-right: 20px;
 
   &:hover {
     background-color: #e9ecef;

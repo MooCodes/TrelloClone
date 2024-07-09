@@ -7,7 +7,7 @@ import {
   BoardTitle,
 } from "./Board.styles";
 import { useNavigate } from "react-router-dom";
-import { Draggable } from "react-beautiful-dnd";
+import { Draggable } from "@hello-pangea/dnd";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 

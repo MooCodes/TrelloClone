@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { BoardsContainer } from "./Boards.styles";
 import Board, { IBoard } from "../Board/Board";
 import BoardForm from "../BoardForm/BoardForm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import { useAppSelector, useAppDispatch } from "../../hooks/redux";
+import { setBoards, setBoardsIndex } from "../../redux/slices/boardsSlice";
 
 const Boards = () => {
   const token = localStorage.getItem("trello-clone-token");
   const queryClient = useQueryClient();
+  const boards = useAppSelector((state) => state.boards.boards);
+  const dispatch = useAppDispatch();
 
   const query = useQuery({
     queryKey: ["boards"],
@@ -22,11 +26,11 @@ const Boards = () => {
     },
   });
 
-  const [boards, setBoards] = useState<IBoard[]>(query.data || []);
-
   useEffect(() => {
-    setBoards(query.data || []);
-  }, [query.data]);
+    if (query.data) {
+      dispatch(setBoards(query.data));
+    }
+  }, [query.data, dispatch]);
 
   const mutation = useMutation({
     mutationFn: ({
@@ -36,8 +40,6 @@ const Boards = () => {
       sourceBoard: IBoard;
       destinationBoard: IBoard;
     }) => {
-      console.log("sourceBoard", sourceBoard);
-      console.log("destinationBoard", destinationBoard);
       return axios.put(
         `http://localhost:5000/api/boards/${sourceBoard._id}/${destinationBoard._id}`,
         {},
@@ -50,13 +52,8 @@ const Boards = () => {
         }
       );
     },
-    onSuccess: ({ data }) => {
-      console.log(data);
-      const boards = queryClient.getQueryData(["boards"]) as IBoard[];
-      queryClient.setQueryData(
-        ["boards"],
-        boards.map((b) => (b._id === data._id ? data : b))
-      );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["boards"] });
     },
   });
 
@@ -68,15 +65,11 @@ const Boards = () => {
     return <div>Error</div>;
   }
 
-  console.log("boards", boards);
-
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDragEnd = (result: any) => {
     if (!result.destination) {
       return;
     }
-
-    console.log(result);
 
     // swap the source index in the database with the destination index
     const sourceIndex = result.source.index;
@@ -88,25 +81,24 @@ const Boards = () => {
 
     console.log("result", result);
 
-    if (!sourceBoard || !destinationBoard) {
+    if (
+      !sourceBoard ||
+      !destinationBoard ||
+      sourceBoard._id === destinationBoard._id
+    ) {
       return;
     }
 
-    if (sourceIndex === destinationIndex) {
-      return;
-    }
-
+    // reorder the boards in our local state
     const reorderedBoards = [...boards];
 
     const [reorderedItem] = reorderedBoards.splice(sourceIndex, 1);
     reorderedBoards.splice(destinationIndex, 0, reorderedItem);
 
-    // set the index for each board to the new index
-    reorderedBoards.forEach((board, index) => {
-      board.index = index;
-    });
+    dispatch(setBoards(reorderedBoards));
 
-    setBoards(reorderedBoards);
+    // update the boards indices values in redux state
+    dispatch(setBoardsIndex());
 
     mutation.mutate({
       sourceBoard,
