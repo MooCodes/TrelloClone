@@ -140,15 +140,15 @@ export const moveBoard = async (req: AuthRequest, res: Response) => {
     console.log(sourceIndex, destinationIndex);
 
     if (sourceIndex < destinationIndex) {
-      // update all boards index that are less than the source board index
-      console.log("yup");
+      // decrement all board incidies that are less than the destination index
+      // and greater than the source index by -1
       await Board.updateMany(
-        { index: { $lte: destinationIndex, $gte: sourceIndex } },
+        { owner: sourceBoard.owner, index: { $lte: destinationIndex, $gte: sourceIndex } },
         { $inc: { index: -1 } }
       );
     } else {
-      console.log("naw");
-      // update all boards index that are greater than the source board index
+      // increment all board incidies that are less than the source index
+      // and greater than the destination index
       await Board.updateMany(
         { index: { $gte: destinationIndex, $lte: sourceIndex } },
         { $inc: { index: 1 } }
@@ -157,7 +157,7 @@ export const moveBoard = async (req: AuthRequest, res: Response) => {
 
     sourceBoard.index = destinationIndex;
     await sourceBoard.save();
-    res.status(200).json({ message: "Indices swapped successfully" });
+    res.status(200).json({ message: "Board moved successfully" });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -216,11 +216,16 @@ export const deleteBoard = async (req: AuthRequest, res: Response) => {
 
     const boardIndex = board.index;
 
-    // update all boards index that are greater than the deleted board index
+    // update all user and members boards index that are greater than the deleted board index
     await Board.updateMany(
-      { index: { $gt: boardIndex } },
+      { members: board.members, index: { $gt: boardIndex } },
       { $inc: { index: -1 } }
-    );
+    )
+
+    // await Board.updateMany(
+    //   { index: { $gt: boardIndex } },
+    //   { $inc: { index: -1 } }
+    // );
 
     // update user boards to remove the board
     await User.updateMany(

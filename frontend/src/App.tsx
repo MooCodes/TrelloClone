@@ -32,7 +32,14 @@ const GlobalStyles = createGlobalStyle`
 
 `;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 
 function App() {
   return (

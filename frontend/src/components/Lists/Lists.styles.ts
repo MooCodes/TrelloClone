@@ -20,7 +20,6 @@ export const ListsContainer = styled.div`
   flex-direction: row;
   background-color: #7B3123;
   margin: 10px;
-  gap: 20px;
 `;
 
 export const ListsHeader = styled.div`

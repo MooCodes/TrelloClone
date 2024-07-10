@@ -12,6 +12,7 @@ export const ListContainer = styled.div`
   height: 100%;
   overflow-y: auto;
   cursor: pointer;
+  margin-right: 20px;
 `;
 
 

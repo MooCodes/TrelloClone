@@ -40,8 +40,6 @@ const ListForm = ({ boardId }: IListFormProps) => {
         "listsAndBoard",
         boardId,
       ]) as IListsAndBoard;
-      console.log("data", data);
-      console.log("listsAndBoard", listsAndBoard);
 
       // append new list to the end of the list
       const newListsAndBoard = {

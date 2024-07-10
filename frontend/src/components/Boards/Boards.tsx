@@ -1,61 +1,33 @@
-import { useEffect } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
 import { BoardsContainer } from "./Boards.styles";
 import Board, { IBoard } from "../Board/Board";
 import BoardForm from "../BoardForm/BoardForm";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
-import { useAppSelector, useAppDispatch } from "../../hooks/redux";
-import { setBoards, setBoardsIndex } from "../../redux/slices/boardsSlice";
+import { fetchBoards, moveBoard } from "../../services/boards";
 
 const Boards = () => {
-  const token = localStorage.getItem("trello-clone-token");
   const queryClient = useQueryClient();
-  const boards = useAppSelector((state) => state.boards.boards);
-  const dispatch = useAppDispatch();
+  // store the boards as client state for re-rendering when the board is moved and looks good (no lags)
+  const [boards, setBoards] = useState([] as IBoard[]);
 
   const query = useQuery({
     queryKey: ["boards"],
-    queryFn: async () => {
-      const response = await axios.get(`http://localhost:5000/api/boards`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data;
+    queryFn: fetchBoards,
+  });
+
+  const mutation = useMutation({
+    mutationFn: moveBoard,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["boards"] });
     },
   });
 
   useEffect(() => {
     if (query.data) {
-      dispatch(setBoards(query.data));
+      setBoards(query.data);
     }
-  }, [query.data, dispatch]);
-
-  const mutation = useMutation({
-    mutationFn: ({
-      sourceBoard,
-      destinationBoard,
-    }: {
-      sourceBoard: IBoard;
-      destinationBoard: IBoard;
-    }) => {
-      return axios.put(
-        `http://localhost:5000/api/boards/${sourceBoard._id}/${destinationBoard._id}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              "trello-clone-token"
-            )}`,
-          },
-        }
-      );
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["boards"] });
-    },
-  });
+  }, [query.data]);
 
   if (query.isLoading) {
     return null;
@@ -95,10 +67,12 @@ const Boards = () => {
     const [reorderedItem] = reorderedBoards.splice(sourceIndex, 1);
     reorderedBoards.splice(destinationIndex, 0, reorderedItem);
 
-    dispatch(setBoards(reorderedBoards));
+    // update the indicies in the client board state
+    reorderedBoards.forEach((board, index) => {
+      board.index = index;
+    });
 
-    // update the boards indices values in redux state
-    dispatch(setBoardsIndex());
+    setBoards(reorderedBoards);
 
     mutation.mutate({
       sourceBoard,
