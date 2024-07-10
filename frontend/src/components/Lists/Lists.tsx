@@ -13,6 +13,7 @@ import {
 import ListForm from "../ListForm/ListForm";
 import { fetchBoards } from "../../services/boards";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
+import { ICard } from "../Card/Card";
 
 const Lists = () => {
   const { boardId } = useParams();
@@ -48,8 +49,14 @@ const Lists = () => {
     },
   });
 
-  const mutation = useMutation({
-    mutationFn: ({ sourceList, destinationList }: { sourceList: IList; destinationList: IList }) => {
+  const listMutation = useMutation({
+    mutationFn: ({
+      sourceList,
+      destinationList,
+    }: {
+      sourceList: IList;
+      destinationList: IList;
+    }) => {
       return axios.put(
         `http://localhost:5000/api/lists/${sourceList._id}/${destinationList._id}`,
         {},
@@ -62,6 +69,47 @@ const Lists = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+    },
+  });
+
+  const cardMutation = useMutation({
+    mutationFn: ({
+      sourceCard,
+      destinationCard,
+    }: {
+      sourceCard: ICard;
+      destinationCard: ICard;
+    }) => {
+      return axios.put(
+        `http://localhost:5000/api/cards/${sourceCard._id}/${destinationCard._id}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: ({ data }) => {
+      console.log("data", data.list);
+      queryClient.invalidateQueries({ queryKey: ["cards", data.list] });
+    },
+  });
+
+  const cardMutationToList = useMutation({
+    mutationFn: ({ card, list, index }: { card: ICard; list: IList, index: number }) => {
+      return axios.put(
+        `http://localhost:5000/api/cards/${card._id}/${list._id}/${index}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    },
+    onSuccess: ({ data }) => {
+      queryClient.invalidateQueries({ queryKey: ["cards", data.list] });
     },
   });
 
@@ -100,35 +148,149 @@ const Lists = () => {
       return;
     }
 
+    console.log("result", result);
+
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
 
-    // get the correspoinding list via indicies
-    const sourceList = lists[sourceIndex];
-    const destinationList = lists[destinationIndex];
+    if (result.source.droppableId === "lists") {
+      // get the correspoinding list via indicies
+      const sourceList = lists[sourceIndex];
+      const destinationList = lists[destinationIndex];
 
-    console.log("result", result);
+      if (
+        !sourceList ||
+        !destinationList ||
+        sourceList._id === destinationList._id
+      ) {
+        return;
+      }
 
-    if (!sourceList || !destinationList || sourceList._id === destinationList._id) {
+      // reorder the lists in our local state
+      const reorderedLists = [...lists];
+
+      const [reorderedItem] = reorderedLists.splice(sourceIndex, 1);
+      reorderedLists.splice(destinationIndex, 0, reorderedItem);
+
+      reorderedLists.forEach((list, index) => {
+        list.index = index;
+      });
+
+      setLists(reorderedLists);
+
+      listMutation.mutate({
+        sourceList,
+        destinationList,
+      });
+
       return;
     }
 
-    // reorder the lists in our local state
-    const reorderedLists = [...lists];
+    // check for if changing cards between the same list
+    if (result.source.droppableId === result.destination.droppableId) {
+      console.log("moving cards between the same list");
+      console.log("sourceIndex", sourceIndex);
+      console.log("destinationIndex", destinationIndex);
 
-    const [reorderedItem] = reorderedLists.splice(sourceIndex, 1);
-    reorderedLists.splice(destinationIndex, 0, reorderedItem);
+      // get the corresponding list
+      const list = lists.find(
+        (list) => list._id === result.destination.droppableId
+      ) as IList;
+      console.log("list", list);
 
-    reorderedLists.forEach((list, index) => {
-      list.index = index;
-    });
+      if (!list) {
+        return;
+      }
 
-    setLists(reorderedLists);
+      const sourceCard = list.cards[sourceIndex];
+      const destinationCard = list.cards[destinationIndex];
 
-    mutation.mutate({
-      sourceList,
-      destinationList,
-    });
+      const reorderedLists = [...lists];
+      console.log("reordedLists", reorderedLists);
+      const reorderedCards = [...list.cards];
+      console.log("reorderedCards", reorderedCards);
+      const [reorderedItem] = reorderedCards.splice(sourceIndex, 1);
+      reorderedCards.splice(destinationIndex, 0, reorderedItem);
+
+      reorderedCards.forEach((card, index) => {
+        card.index = index;
+      });
+
+      const newLists = reorderedLists.map((list) => {
+        const newList = { ...list };
+        if (list._id === result.source.droppableId) {
+          newList.cards = reorderedCards;
+        }
+        return newList;
+      });
+
+      setLists(newLists);
+
+      cardMutation.mutate({
+        sourceCard,
+        destinationCard,
+      });
+      return;
+    }
+
+    if (result.source.droppableId !== result.destination.droppableId) {
+      console.log("moving cards between different lists");
+
+      const sourceList = lists.find(
+        (list) => list._id === result.source.droppableId
+      ) as IList;
+      const destinationList = lists.find(
+        (list) => list._id === result.destination.droppableId
+      ) as IList;
+
+      console.log("sourceList", sourceList);
+      console.log("destinationList", destinationList);
+
+      if (!sourceList || !destinationList) {
+        return;
+      }
+
+      const sourceCard = sourceList.cards[sourceIndex] as ICard;
+
+      const reorderedLists = [...lists];
+      const reorderedSourceCards = [...sourceList.cards];
+      const reorderedDestinationCards = [...destinationList.cards];
+
+      const [reorderedItem] = reorderedSourceCards.splice(sourceIndex, 1);
+      reorderedDestinationCards.splice(destinationIndex, 0, reorderedItem);
+      reorderedSourceCards.forEach((card, index) => {
+        card.index = index;
+      });
+      reorderedDestinationCards.forEach((card, index) => {
+        card.index = index;
+      });
+
+      const newLists = reorderedLists.map((list) => {
+        const newList = { ...list };
+        if (list._id === result.source.droppableId) {
+          newList.cards = reorderedSourceCards;
+        }
+        if (list._id === result.destination.droppableId) {
+          newList.cards = reorderedDestinationCards;
+        }
+        return newList;
+      });
+
+      setLists(newLists);
+      console.log("sending different lists mutation");
+      // this mutate might not work correctly
+      console.log("sourceCard", sourceCard);
+      console.log("destinationIndex", destinationIndex);
+
+      cardMutationToList.mutate({
+        card: sourceCard,
+        list: destinationList,
+        index: destinationIndex,
+      });
+      
+      return;
+    }
+
   };
 
   return (
@@ -155,6 +317,7 @@ const Lists = () => {
                   title={list.title}
                   cards={list.cards}
                   index={list.index}
+                  boardId={boardFromServer._id}
                 />
               ))}
               {provided.placeholder}

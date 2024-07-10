@@ -5,11 +5,10 @@ import {
   CardTitleInput,
   CardTitleContainer,
 } from "./CardForm.styles";
-import { useMutation, useQueryClient} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { ICard } from "../Card/Card";
 
-const CardForm = ({ listId }: { listId: string }) => {
+const CardForm = ({ listId, boardId }: { listId: string; boardId: string }) => {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const token = localStorage.getItem("trello-clone-token");
@@ -25,12 +24,9 @@ const CardForm = ({ listId }: { listId: string }) => {
         }
       );
     },
-    onSuccess: ({ data }) => {
+    onSuccess: () => {
       setTitle("");
-
-      const cards = queryClient.getQueryData(["cards", listId]) as ICard[];
-
-      queryClient.setQueryData(["cards", listId], [...cards, data]);
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
     },
   });
 

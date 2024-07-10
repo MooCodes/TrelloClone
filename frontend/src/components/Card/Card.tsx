@@ -1,15 +1,25 @@
 import { CardContainer, CardTitle } from "./Card.styles";
+import { Draggable } from "@hello-pangea/dnd";
 
 export interface ICard {
-  _id?: string;
+  _id: string;
   title: string;
+  index: number;
 }
 
-const Card = ({ title }: ICard) => {
+const Card = ({ title, _id, index }: ICard) => {
   return (
-    <CardContainer>
-      <CardTitle>{title}</CardTitle>
-    </CardContainer>
+    <Draggable key={_id} draggableId={_id} index={index}>
+      {(provided) => (
+        <CardContainer
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+        >
+          <CardTitle>{title}</CardTitle>
+        </CardContainer>
+      )}
+    </Draggable>
   );
 };
 

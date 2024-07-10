@@ -143,7 +143,9 @@ export const moveBoard = async (req: AuthRequest, res: Response) => {
       // decrement all board incidies that are less than the destination index
       // and greater than the source index by -1
       await Board.updateMany(
-        { owner: sourceBoard.owner, index: { $lte: destinationIndex, $gte: sourceIndex } },
+        {
+          index: { $lte: destinationIndex, $gte: sourceIndex },
+        },
         { $inc: { index: -1 } }
       );
     } else {
@@ -220,7 +222,7 @@ export const deleteBoard = async (req: AuthRequest, res: Response) => {
     await Board.updateMany(
       { members: board.members, index: { $gt: boardIndex } },
       { $inc: { index: -1 } }
-    )
+    );
 
     // await Board.updateMany(
     //   { index: { $gt: boardIndex } },

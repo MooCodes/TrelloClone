@@ -15,11 +15,15 @@ export const ListContainer = styled.div`
   margin-right: 20px;
 `;
 
-
 export const ListTitle = styled.h3`
   font-size: 16px;
   font-weight: bold;
   color: #B6C2CF;
   margin: 0;
   margin-left: 5px;
+`;
+
+export const CardsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
 `;

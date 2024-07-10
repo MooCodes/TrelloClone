@@ -1,6 +1,6 @@
 import { Response } from "express";
 import Card from "../models/Card";
-import List from "../models/List";
+import List, { IList } from "../models/List";
 import Board from "../models/Board";
 import { AuthRequest } from "../middleware/auth";
 import { ObjectId } from "mongoose";
@@ -31,6 +31,7 @@ export const createCard = async (req: AuthRequest, res: Response) => {
     const newCard = new Card({
       title,
       list: list._id,
+      index: list.cards.length,
     });
 
     await newCard.save();
@@ -76,7 +77,148 @@ export const getCards = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Cards not found" });
     }
 
-    res.status(200).json(cards);
+    // sort the cards by index
+    const cardsToSend = cards.sort((a, b) => a.index - b.index);
+
+    res.status(200).json(cardsToSend);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const moveCardToList = async (req: AuthRequest, res: Response) => {
+  const cardId = req.params.cardId;
+  const listId = req.params.listId;
+  const index = req.params.index;
+
+  console.log("yo from move card to list");
+  console.log(cardId, listId, index);
+
+  try {
+    const card = await Card.findById(cardId);
+    const list = await List.findById(listId);
+
+    if (!card || !list) {
+      return res.status(404).json({ message: "Card or list not found" });
+    }
+
+    const previousList = await List.findById(card.list);
+
+    // find the board
+    const board = await Board.findById(list.board);
+
+    // only board members can move a card
+    const isBoardMember = board!.members.includes(req.user?._id as ObjectId);
+    if (!isBoardMember) {
+      return res.status(401).json({
+        message: "Unauthorized: Only the board members can move a card",
+      });
+    }
+
+    // remove the card from the old list
+    await List.findByIdAndUpdate(previousList!._id, {
+      $pull: { cards: cardId },
+    });
+
+    // update the indices of all the cards in the old list that are after the card
+    await Card.updateMany(
+      { list: previousList!._id, index: { $gte: card.index } },
+      { $inc: { index: -1 } }
+    );
+
+    // update the indices of all the cards in the new list that are after the card
+    const updatedCard = await Card.updateMany(
+      { list: list._id, index: { $gte: index } },
+      { $inc: { index: 1 } },
+      { new: true }
+    );
+
+    // set the card's list to the new list
+    // set the card's index to the new index
+    await Card.findByIdAndUpdate(cardId, {
+      list: list._id,
+      index,
+    });
+
+    // add the card to the new list
+    await List.findByIdAndUpdate(list._id, {
+      $push: { cards: cardId },
+    });
+
+    res.status(200).json(updatedCard);
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+};
+
+export const moveCard = async (req: AuthRequest, res: Response) => {
+  const sourceCardId = req.params.sourceCardId;
+  const destinationCardId = req.params.destinationCardId;
+
+  console.log("yo");
+
+  try {
+    const sourceCard = await Card.findById(sourceCardId);
+    const destinationCard = await Card.findById(destinationCardId);
+
+    if (!sourceCard || !destinationCard) {
+      return res.status(404).json({ message: "Card not found" });
+    }
+
+    // find the lists that the cards belong to
+    const sourceList = await List.findById(sourceCard.list);
+
+    if (!sourceList) {
+      return res.status(404).json({ message: "List not found" });
+    }
+
+    // find the board
+    const board = await Board.findById(sourceList.board);
+
+    // only board members can move a card
+    const isBoardMember = board!.members.includes(req.user?._id as ObjectId);
+    if (!isBoardMember) {
+      return res.status(401).json({
+        message: "Unauthorized: Only the board members can move a card",
+      });
+    }
+
+    const sourceCardIndex = sourceCard.index;
+    const destinationCardIndex = destinationCard.index;
+
+    console.log("sourceList._id", sourceList._id);
+
+    // are we moving the card into a different list?
+    // check if moving right or left so we can update all other card indices
+    if (sourceCardIndex < destinationCardIndex) {
+      // decrement all card incidies that are lte to the destination index
+      // and gte the source index
+      await Card.updateMany(
+        {
+          list: sourceList._id,
+          index: { $lte: destinationCardIndex, $gte: sourceCardIndex },
+        },
+        { $inc: { index: -1 } }
+      );
+    } else if (sourceCardIndex > destinationCardIndex) {
+      // increment all card incidies that are gte to the source index
+      // and lte the destination index
+      await Card.updateMany(
+        {
+          list: sourceList._id,
+          index: { $gte: destinationCardIndex, $lte: sourceCardIndex },
+        },
+        { $inc: { index: 1 } }
+      );
+    }
+
+    sourceCard.index = destinationCardIndex;
+    await sourceCard.save();
+    res.status(200).json(sourceCard);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });

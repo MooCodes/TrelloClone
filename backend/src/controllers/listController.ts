@@ -68,13 +68,21 @@ export const getLists = async (req: AuthRequest, res: Response) => {
     const lists = await List.find({ board: boardId }).populate("cards");
 
     // sort lists by index
-    lists.sort((a, b) => a.index - b.index);
+    let listsToReturn = lists.sort((a, b) => a.index - b.index);
+
+    // sort cards in each list by index
+    listsToReturn = listsToReturn.map((list) => {
+      list.cards = list.cards.sort((a: any, b: any) => {
+        return a.index - b.index;
+      });
+      return list;
+    });
 
     if (!lists) {
       return res.status(404).json({ message: "Lists not found" });
     }
 
-    res.status(200).json(lists);
+    res.status(200).json(listsToReturn);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -110,8 +118,8 @@ export const moveList = async (req: AuthRequest, res: Response) => {
 
     // check if moving right or left so we can update all other lists indices
     if (sourceListIndex < destinationListIndex) {
-      // decrement all lists incidies that are less than the destination index
-      // and greater than the source index
+      // decrement all lists incidies that are lte to the destination index
+      // and gte the source index
       await List.updateMany(
         {
           board: sourceList.board,
@@ -120,8 +128,8 @@ export const moveList = async (req: AuthRequest, res: Response) => {
         { $inc: { index: -1 } }
       );
     } else {
-      // increment all lists incidies that are less than the source index
-      // and greater than the destination index
+      // increment all lists incidies that are lte to the source index
+      // and gte than the destination index
       await List.updateMany(
         {
           board: sourceList.board,
