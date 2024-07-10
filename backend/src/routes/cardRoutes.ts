@@ -14,7 +14,7 @@ const router = Router();
 router.post("/:listId", auth, createCard);
 router.get("/:listId", auth, getCards);
 router.put("/:cardId", auth, updateCard);
-router.put("/:sourceCardId/:destinationCardId", auth, moveCard);
+router.put("/:sourceCardId/:destinationIndex", auth, moveCard);
 router.put("/:cardId/:listId/:index", auth, moveCardToList);
 router.delete("/:cardId", auth, deleteCard);
 

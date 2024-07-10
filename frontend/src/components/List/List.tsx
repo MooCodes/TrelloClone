@@ -39,10 +39,6 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
     return <div>Error</div>;
   }
 
-  // const { data: cards } = query;
-
-  console.log("cards from serv", cards);
-
   return (
     <Draggable key={_id} draggableId={_id} index={index}>
       {(provided) => (

@@ -44,8 +44,7 @@ export const getBoards = async (req: AuthRequest, res: Response) => {
     });
 
     // sort the boards by index
-    const boardsToSend = boards.sort((a, b) => a.index - b.index);
-    res.status(200).json(boardsToSend);
+    res.status(200).json(boards);
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -116,62 +115,9 @@ export const addUserToBoard = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const moveBoard = async (req: AuthRequest, res: Response) => {
-  const sourceBoardId = req.params.sourceBoardId;
-  const destinationBoardId = req.params.destinationBoardId;
-
-  try {
-    const sourceBoard = await Board.findById(sourceBoardId);
-    const destinationBoard = await Board.findById(destinationBoardId);
-
-    if (!sourceBoard || !destinationBoard) {
-      return res.status(404).json({ message: "Board not found" });
-    }
-
-    if (sourceBoard.owner.toString() !== (req.user?._id as string).toString()) {
-      return res.status(401).json({
-        message: "Unauthorized: Only the board owner can swap indices",
-      });
-    }
-
-    const sourceIndex = sourceBoard.index;
-    const destinationIndex = destinationBoard.index;
-
-    console.log(sourceIndex, destinationIndex);
-
-    if (sourceIndex < destinationIndex) {
-      // decrement all board incidies that are less than the destination index
-      // and greater than the source index by -1
-      await Board.updateMany(
-        {
-          index: { $lte: destinationIndex, $gte: sourceIndex },
-        },
-        { $inc: { index: -1 } }
-      );
-    } else {
-      // increment all board incidies that are less than the source index
-      // and greater than the destination index
-      await Board.updateMany(
-        { index: { $gte: destinationIndex, $lte: sourceIndex } },
-        { $inc: { index: 1 } }
-      );
-    }
-
-    sourceBoard.index = destinationIndex;
-    await sourceBoard.save();
-    res.status(200).json({ message: "Board moved successfully" });
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-};
-
 export const updateBoard = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
   const { name, index } = req.body;
-
-  console.log(name, index);
 
   try {
     const board = await Board.findById(boardId);
@@ -215,19 +161,6 @@ export const deleteBoard = async (req: AuthRequest, res: Response) => {
         message: "Unauthorized: Only the board owner can delete the board",
       });
     }
-
-    const boardIndex = board.index;
-
-    // update all user and members boards index that are greater than the deleted board index
-    await Board.updateMany(
-      { members: board.members, index: { $gt: boardIndex } },
-      { $inc: { index: -1 } }
-    );
-
-    // await Board.updateMany(
-    //   { index: { $gt: boardIndex } },
-    //   { $inc: { index: -1 } }
-    // );
 
     // update user boards to remove the board
     await User.updateMany(

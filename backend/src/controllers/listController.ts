@@ -48,6 +48,7 @@ export const createList = async (req: AuthRequest, res: Response) => {
 
 export const getLists = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
+
   try {
     // find the corresponding board
     const board = await Board.findById(boardId);
@@ -92,13 +93,12 @@ export const getLists = async (req: AuthRequest, res: Response) => {
 
 export const moveList = async (req: AuthRequest, res: Response) => {
   const sourceListId = req.params.sourceListId;
-  const destinationListId = req.params.destinationListId;
+  const destinationIndex = Number(req.params.destinationIndex);
 
   try {
     const sourceList = await List.findById(sourceListId);
-    const destinationList = await List.findById(destinationListId);
 
-    if (!sourceList || !destinationList) {
+    if (!sourceList) {
       return res.status(404).json({ message: "List not found" });
     }
 
@@ -113,17 +113,16 @@ export const moveList = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const sourceListIndex = sourceList.index;
-    const destinationListIndex = destinationList.index;
+    const sourceIndex = sourceList.index;
 
     // check if moving right or left so we can update all other lists indices
-    if (sourceListIndex < destinationListIndex) {
+    if (sourceIndex < destinationIndex) {
       // decrement all lists incidies that are lte to the destination index
       // and gte the source index
       await List.updateMany(
         {
           board: sourceList.board,
-          index: { $gte: sourceListIndex, $lte: destinationListIndex },
+          index: { $gte: sourceIndex, $lte: destinationIndex },
         },
         { $inc: { index: -1 } }
       );
@@ -133,13 +132,13 @@ export const moveList = async (req: AuthRequest, res: Response) => {
       await List.updateMany(
         {
           board: sourceList.board,
-          index: { $lte: sourceListIndex, $gte: destinationListIndex },
+          index: { $lte: sourceIndex, $gte: destinationIndex },
         },
         { $inc: { index: 1 } }
       );
     }
 
-    sourceList.index = destinationListIndex;
+    sourceList.index = destinationIndex;
     await sourceList.save();
     res.status(200).json({ message: "List moved successfully" });
   } catch (error) {

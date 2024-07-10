@@ -52,13 +52,13 @@ const Lists = () => {
   const listMutation = useMutation({
     mutationFn: ({
       sourceList,
-      destinationList,
+      destinationIndex,
     }: {
       sourceList: IList;
-      destinationList: IList;
+      destinationIndex: number;
     }) => {
       return axios.put(
-        `http://localhost:5000/api/lists/${sourceList._id}/${destinationList._id}`,
+        `http://localhost:5000/api/lists/${sourceList._id}/${destinationIndex}`,
         {},
         {
           headers: {
@@ -75,13 +75,13 @@ const Lists = () => {
   const cardMutation = useMutation({
     mutationFn: ({
       sourceCard,
-      destinationCard,
+      destinationIndex,
     }: {
       sourceCard: ICard;
-      destinationCard: ICard;
+      destinationIndex: number;
     }) => {
       return axios.put(
-        `http://localhost:5000/api/cards/${sourceCard._id}/${destinationCard._id}`,
+        `http://localhost:5000/api/cards/${sourceCard._id}/${destinationIndex}`,
         {},
         {
           headers: {
@@ -90,14 +90,21 @@ const Lists = () => {
         }
       );
     },
-    onSuccess: ({ data }) => {
-      console.log("data", data.list);
-      queryClient.invalidateQueries({ queryKey: ["cards", data.list] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
     },
   });
 
   const cardMutationToList = useMutation({
-    mutationFn: ({ card, list, index }: { card: ICard; list: IList, index: number }) => {
+    mutationFn: ({
+      card,
+      list,
+      index,
+    }: {
+      card: ICard;
+      list: IList;
+      index: number;
+    }) => {
       return axios.put(
         `http://localhost:5000/api/cards/${card._id}/${list._id}/${index}`,
         {},
@@ -107,9 +114,6 @@ const Lists = () => {
           },
         }
       );
-    },
-    onSuccess: ({ data }) => {
-      queryClient.invalidateQueries({ queryKey: ["cards", data.list] });
     },
   });
 
@@ -136,19 +140,12 @@ const Lists = () => {
   }
 
   const boardFromServer = query.data.board;
-  const listsFromServer = query.data.lists;
-
-  console.log("board", boardFromServer);
-  console.log("lists", listsFromServer);
-  console.log("boards", boards);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleDragEnd = (result: any) => {
     if (!result.destination) {
       return;
     }
-
-    console.log("result", result);
 
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
@@ -180,7 +177,7 @@ const Lists = () => {
 
       listMutation.mutate({
         sourceList,
-        destinationList,
+        destinationIndex,
       });
 
       return;
@@ -189,26 +186,20 @@ const Lists = () => {
     // check for if changing cards between the same list
     if (result.source.droppableId === result.destination.droppableId) {
       console.log("moving cards between the same list");
-      console.log("sourceIndex", sourceIndex);
-      console.log("destinationIndex", destinationIndex);
 
       // get the corresponding list
       const list = lists.find(
         (list) => list._id === result.destination.droppableId
       ) as IList;
-      console.log("list", list);
 
       if (!list) {
         return;
       }
 
       const sourceCard = list.cards[sourceIndex];
-      const destinationCard = list.cards[destinationIndex];
 
       const reorderedLists = [...lists];
-      console.log("reordedLists", reorderedLists);
       const reorderedCards = [...list.cards];
-      console.log("reorderedCards", reorderedCards);
       const [reorderedItem] = reorderedCards.splice(sourceIndex, 1);
       reorderedCards.splice(destinationIndex, 0, reorderedItem);
 
@@ -228,7 +219,7 @@ const Lists = () => {
 
       cardMutation.mutate({
         sourceCard,
-        destinationCard,
+        destinationIndex,
       });
       return;
     }
@@ -242,9 +233,6 @@ const Lists = () => {
       const destinationList = lists.find(
         (list) => list._id === result.destination.droppableId
       ) as IList;
-
-      console.log("sourceList", sourceList);
-      console.log("destinationList", destinationList);
 
       if (!sourceList || !destinationList) {
         return;
@@ -277,20 +265,13 @@ const Lists = () => {
       });
 
       setLists(newLists);
-      console.log("sending different lists mutation");
-      // this mutate might not work correctly
-      console.log("sourceCard", sourceCard);
-      console.log("destinationIndex", destinationIndex);
 
       cardMutationToList.mutate({
         card: sourceCard,
         list: destinationList,
         index: destinationIndex,
       });
-      
-      return;
     }
-
   };
 
   return (

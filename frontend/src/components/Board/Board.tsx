@@ -1,4 +1,3 @@
-import React from "react";
 import {
   BoardContainer,
   BoardDeleteButton,
@@ -7,17 +6,15 @@ import {
   BoardTitle,
 } from "./Board.styles";
 import { useNavigate } from "react-router-dom";
-import { Draggable } from "@hello-pangea/dnd";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 
 export interface IBoard {
   _id: string;
   name: string;
-  index: number;
 }
 
-const Board = ({ _id, name, index }: IBoard) => {
+const Board = ({ _id, name }: IBoard) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -43,28 +40,20 @@ const Board = ({ _id, name, index }: IBoard) => {
   };
 
   return (
-    <Draggable key={_id} draggableId={_id} index={index}>
-      {(provided) => (
-        <BoardContainer
-          ref={provided.innerRef}
-          {...provided.dragHandleProps}
-          {...provided.draggableProps}
-        >
-          <BoardHeader>
-            <BoardTitle>{name}</BoardTitle>
-          </BoardHeader>
+    <BoardContainer>
+      <BoardHeader>
+        <BoardTitle>{name}</BoardTitle>
+      </BoardHeader>
 
-          <div style={{ position: "absolute", bottom: "10px", right: "80px" }}>
-            <BoardGoButton onClick={() => navigate(`/boards/${_id}`)}>
-              Go To Board
-            </BoardGoButton>
-          </div>
-          <div style={{ position: "absolute", bottom: "10px", right: "10px" }}>
-            <BoardDeleteButton onClick={onDelete}>Delete</BoardDeleteButton>
-          </div>
-        </BoardContainer>
-      )}
-    </Draggable>
+      <div style={{ position: "absolute", bottom: "10px", right: "80px" }}>
+        <BoardGoButton onClick={() => navigate(`/boards/${_id}`)}>
+          Go To Board
+        </BoardGoButton>
+      </div>
+      <div style={{ position: "absolute", bottom: "10px", right: "10px" }}>
+        <BoardDeleteButton onClick={onDelete}>Delete</BoardDeleteButton>
+      </div>
+    </BoardContainer>
   );
 };
 

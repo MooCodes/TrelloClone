@@ -93,9 +93,6 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
   const listId = req.params.listId;
   const index = req.params.index;
 
-  console.log("yo from move card to list");
-  console.log(cardId, listId, index);
-
   try {
     const card = await Card.findById(cardId);
     const list = await List.findById(listId);
@@ -157,15 +154,12 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
 
 export const moveCard = async (req: AuthRequest, res: Response) => {
   const sourceCardId = req.params.sourceCardId;
-  const destinationCardId = req.params.destinationCardId;
-
-  console.log("yo");
+  const destinationIndex = Number(req.params.destinationIndex);
 
   try {
     const sourceCard = await Card.findById(sourceCardId);
-    const destinationCard = await Card.findById(destinationCardId);
 
-    if (!sourceCard || !destinationCard) {
+    if (!sourceCard) {
       return res.status(404).json({ message: "Card not found" });
     }
 
@@ -188,35 +182,32 @@ export const moveCard = async (req: AuthRequest, res: Response) => {
     }
 
     const sourceCardIndex = sourceCard.index;
-    const destinationCardIndex = destinationCard.index;
-
-    console.log("sourceList._id", sourceList._id);
 
     // are we moving the card into a different list?
     // check if moving right or left so we can update all other card indices
-    if (sourceCardIndex < destinationCardIndex) {
+    if (sourceCardIndex < destinationIndex) {
       // decrement all card incidies that are lte to the destination index
       // and gte the source index
       await Card.updateMany(
         {
           list: sourceList._id,
-          index: { $lte: destinationCardIndex, $gte: sourceCardIndex },
+          index: { $lte: destinationIndex, $gte: sourceCardIndex },
         },
         { $inc: { index: -1 } }
       );
-    } else if (sourceCardIndex > destinationCardIndex) {
+    } else if (sourceCardIndex > destinationIndex) {
       // increment all card incidies that are gte to the source index
       // and lte the destination index
       await Card.updateMany(
         {
           list: sourceList._id,
-          index: { $gte: destinationCardIndex, $lte: sourceCardIndex },
+          index: { $gte: destinationIndex, $lte: sourceCardIndex },
         },
         { $inc: { index: 1 } }
       );
     }
 
-    sourceCard.index = destinationCardIndex;
+    sourceCard.index = destinationIndex;
     await sourceCard.save();
     res.status(200).json(sourceCard);
   } catch (error) {

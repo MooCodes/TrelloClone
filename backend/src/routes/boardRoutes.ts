@@ -6,7 +6,6 @@ import {
   addUserToBoard,
   updateBoard,
   deleteBoard,
-  moveBoard
 } from "../controllers/boardController";
 import auth from "../middleware/auth";
 
@@ -17,7 +16,6 @@ router.get("/", auth, getBoards);
 router.get("/:boardId", auth, getBoard);
 router.post("/:boardId/addUser", auth, addUserToBoard);
 router.put("/:boardId", auth, updateBoard);
-router.put("/:sourceBoardId/:destinationBoardId", auth, moveBoard);
 router.delete("/:boardId", auth, deleteBoard);
 
 export default router;
