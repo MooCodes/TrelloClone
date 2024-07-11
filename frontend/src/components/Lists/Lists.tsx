@@ -147,19 +147,18 @@ const Lists = () => {
       return;
     }
 
+    console.log("result", result);
+
     const sourceIndex = result.source.index;
     const destinationIndex = result.destination.index;
 
     if (result.source.droppableId === "lists") {
-      // get the correspoinding list via indicies
-      const sourceList = lists[sourceIndex];
-      const destinationList = lists[destinationIndex];
+      // if dragging lists
 
-      if (
-        !sourceList ||
-        !destinationList ||
-        sourceList._id === destinationList._id
-      ) {
+      // get the corresponding list
+      const sourceList = lists[sourceIndex];
+
+      if (!sourceList || sourceIndex === destinationIndex) {
         return;
       }
 
@@ -179,12 +178,8 @@ const Lists = () => {
         sourceList,
         destinationIndex,
       });
-
-      return;
-    }
-
-    // check for if changing cards between the same list
-    if (result.source.droppableId === result.destination.droppableId) {
+    } else if (result.source.droppableId === result.destination.droppableId) {
+      // if dragging cards between the same list
       console.log("moving cards between the same list");
 
       // get the corresponding list
@@ -221,10 +216,8 @@ const Lists = () => {
         sourceCard,
         destinationIndex,
       });
-      return;
-    }
-
-    if (result.source.droppableId !== result.destination.droppableId) {
+    } else if (result.source.droppableId !== result.destination.droppableId) {
+      // if changing cards between different lists
       console.log("moving cards between different lists");
 
       const sourceList = lists.find(
@@ -246,9 +239,11 @@ const Lists = () => {
 
       const [reorderedItem] = reorderedSourceCards.splice(sourceIndex, 1);
       reorderedDestinationCards.splice(destinationIndex, 0, reorderedItem);
+
       reorderedSourceCards.forEach((card, index) => {
         card.index = index;
       });
+
       reorderedDestinationCards.forEach((card, index) => {
         card.index = index;
       });

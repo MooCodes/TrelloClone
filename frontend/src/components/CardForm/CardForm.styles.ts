@@ -3,6 +3,7 @@ import styled from "styled-components";
 export const CardFormContainer = styled.form`
   display: flex;
   flex-direction: column;
+  margin: 0px 10px 10px 10px;
 `;
 
 export const CardTitleContainer = styled.div`

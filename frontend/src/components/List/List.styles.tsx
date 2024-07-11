@@ -6,13 +6,11 @@ export const ListContainer = styled.div`
   background-color: #101204;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  padding: 10px;
   width: 250px;
-  gap: 10px;
   height: 100%;
   overflow-y: auto;
-  cursor: pointer;
   margin-right: 20px;
+  margin-bottom: 20px;
 `;
 
 export const ListTitle = styled.h3`
@@ -20,7 +18,7 @@ export const ListTitle = styled.h3`
   font-weight: bold;
   color: #B6C2CF;
   margin: 0;
-  margin-left: 5px;
+  padding: 10px;
 `;
 
 export const CardsContainer = styled.div`
