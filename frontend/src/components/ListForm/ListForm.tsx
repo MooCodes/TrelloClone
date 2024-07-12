@@ -6,12 +6,17 @@ import {
   ListFormButton,
 } from "./ListForm.styles";
 import { IList } from "../List/List";
+import { IBoard } from "../Board/Board";
 import axios from "axios";
 import { socket } from "../../socket";
 
 interface IListFormProps {
   boardId: string;
-  setLists: React.Dispatch<React.SetStateAction<IList[]>>;
+}
+
+interface IListAndBoard {
+  board: IBoard;
+  lists: IList[];
 }
 
 const ListForm = ({ boardId }: IListFormProps) => {
@@ -31,11 +36,29 @@ const ListForm = ({ boardId }: IListFormProps) => {
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      console.log(data);
       setTitle("");
-      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+      // queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
-      socket.emit("refreshList", boardId);
+      // get the old lists
+      const oldLists = queryClient.getQueryData([
+        "listsAndBoard",
+        boardId,
+      ]) as IListAndBoard;
+
+      const newListsAndBoard = {
+        ...oldLists,
+        lists: [...oldLists.lists, data],
+      };
+
+      console.log("setting newListsAndBoard", newListsAndBoard);
+
+      queryClient.setQueryData(["listsAndBoard", boardId], newListsAndBoard);
+
+      console.log("oldLists", newListsAndBoard);
+
+      socket.emit("refreshLists", boardId);
     },
   });
 

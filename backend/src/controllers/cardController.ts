@@ -126,7 +126,7 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
     );
 
     // update the indices of all the cards in the new list that are after the card
-    const updatedCard = await Card.updateMany(
+    await Card.updateMany(
       { list: list._id, index: { $gte: index } },
       { $inc: { index: 1 } },
       { new: true }
@@ -143,6 +143,8 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
     await List.findByIdAndUpdate(list._id, {
       $push: { cards: cardId },
     });
+
+    const updatedCard = await Card.findById(cardId);
 
     res.status(200).json(updatedCard);
   } catch (error) {

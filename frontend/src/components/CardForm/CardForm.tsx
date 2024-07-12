@@ -7,6 +7,7 @@ import {
 } from "./CardForm.styles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
+import { socket } from "../../socket";
 
 interface ICardFormProps {
   listId: string;
@@ -32,6 +33,8 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
     onSuccess: () => {
       setTitle("");
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      socket.emit("refreshLists", boardId);
     },
   });
 

@@ -26,10 +26,12 @@ const Lists = () => {
     console.log("emitting joinRoom event");
     socket.emit("joinRoom", boardId);
 
-    socket.on("addList", () => {
+    socket.on("refreshLists", () => {
       console.log("refreshing list");
+
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
     });
-  }, [boardId]);
+  }, [boardId, queryClient]);
 
   const query = useQuery({
     queryKey: ["listsAndBoard", boardId],
@@ -73,9 +75,9 @@ const Lists = () => {
       );
     },
     onSuccess: () => {
-      // send a web socket message to update the board with the new list
-
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      socket.emit("refreshLists", boardId);
     },
   });
 
@@ -99,6 +101,8 @@ const Lists = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      socket.emit("refreshLists", boardId);
     },
   });
 
@@ -121,6 +125,11 @@ const Lists = () => {
           },
         }
       );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      socket.emit("refreshLists", boardId);
     },
   });
 
@@ -177,7 +186,7 @@ const Lists = () => {
 
       setLists(reorderedLists);
 
-      await listMutation.mutate({
+      listMutation.mutate({
         sourceList,
         destinationIndex,
       });
@@ -215,7 +224,7 @@ const Lists = () => {
 
       setLists(newLists);
 
-      await cardMutation.mutate({
+      cardMutation.mutate({
         sourceCard,
         destinationIndex,
       });
@@ -264,7 +273,7 @@ const Lists = () => {
 
       setLists(newLists);
 
-      await cardMutationToList.mutate({
+      cardMutationToList.mutate({
         card: sourceCard,
         list: destinationList,
         index: destinationIndex,
@@ -300,7 +309,7 @@ const Lists = () => {
                 />
               ))}
               {provided.placeholder}
-              <ListForm boardId={boardFromServer._id} setLists={setLists} />
+              <ListForm boardId={boardFromServer._id} />
             </ListsContainer>
           )}
         </Droppable>

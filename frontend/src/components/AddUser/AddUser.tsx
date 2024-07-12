@@ -1,30 +1,7 @@
 import React, { useState } from "react";
-import styled from "styled-components";
+import { FormButton, FormContainer, FormInput } from "./AddUser.styles";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
-
-const FormContainer = styled.form`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-`;
-
-const FormInput = styled.input`
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 200px;
-`;
-
-const FormButton = styled.button`
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-`;
 
 interface IAddUserProps {
   boardId: string;
@@ -39,9 +16,9 @@ const AddUserForm = ({ boardId }: IAddUserProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Add logic to handle form submission here
-    console.log("User email:", email);
 
+    console.log("email", email);
+    
     await addUser.mutate();
 
     setEmail(""); // Clear the input after submission

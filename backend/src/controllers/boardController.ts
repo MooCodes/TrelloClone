@@ -71,6 +71,8 @@ export const addUserToBoard = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
   const userEmailToAdd = req.body.email;
 
+  console.log(boardId, userEmailToAdd);
+
   try {
     const board = await Board.findById(boardId);
 
