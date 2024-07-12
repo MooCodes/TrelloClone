@@ -18,8 +18,8 @@ export const CardTitleContainer = styled.div`
 export const CardTitleInput = styled.input`
   background-color: #22272b;
   border: none;
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: normal;
   color: #b6c2cf;
   margin: 0;
   width: 100%;

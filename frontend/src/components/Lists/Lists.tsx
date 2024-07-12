@@ -4,16 +4,17 @@ import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import List, { IList } from "../List/List";
 import { IBoard } from "../Board/Board";
-import {
-  BoardName,
-  ListsContainer,
-  ListsHeader,
-  ListsInviteButton,
-} from "./Lists.styles";
+import { BoardName, ListsContainer, ListsHeader } from "./Lists.styles";
 import ListForm from "../ListForm/ListForm";
-import { fetchBoards } from "../../services/boards";
 import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { ICard } from "../Card/Card";
+import AddUser from "../AddUser/AddUser";
+import { socket } from "../../socket";
+
+export interface IListsAndBoard {
+  board: IBoard;
+  lists: IList[];
+}
 
 const Lists = () => {
   const { boardId } = useParams();
@@ -21,10 +22,14 @@ const Lists = () => {
   const [lists, setLists] = useState<IList[]>([]);
   const queryClient = useQueryClient();
 
-  const { data: boards } = useQuery({
-    queryKey: ["boards"],
-    queryFn: fetchBoards,
-  });
+  useEffect(() => {
+    console.log("emitting joinRoom event");
+    socket.emit("joinRoom", boardId);
+
+    socket.on("addList", () => {
+      console.log("refreshing list");
+    });
+  }, [boardId]);
 
   const query = useQuery({
     queryKey: ["listsAndBoard", boardId],
@@ -68,6 +73,8 @@ const Lists = () => {
       );
     },
     onSuccess: () => {
+      // send a web socket message to update the board with the new list
+
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
     },
   });
@@ -135,14 +142,10 @@ const Lists = () => {
     return null;
   }
 
-  if (!boards) {
-    return null;
-  }
-
   const boardFromServer = query.data.board;
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleDragEnd = (result: any) => {
+  const handleDragEnd = async (result: any) => {
     if (!result.destination) {
       return;
     }
@@ -174,7 +177,7 @@ const Lists = () => {
 
       setLists(reorderedLists);
 
-      listMutation.mutate({
+      await listMutation.mutate({
         sourceList,
         destinationIndex,
       });
@@ -212,7 +215,7 @@ const Lists = () => {
 
       setLists(newLists);
 
-      cardMutation.mutate({
+      await cardMutation.mutate({
         sourceCard,
         destinationIndex,
       });
@@ -261,7 +264,7 @@ const Lists = () => {
 
       setLists(newLists);
 
-      cardMutationToList.mutate({
+      await cardMutationToList.mutate({
         card: sourceCard,
         list: destinationList,
         index: destinationIndex,
@@ -277,7 +280,7 @@ const Lists = () => {
     >
       <ListsHeader>
         <BoardName>{boardFromServer.name}</BoardName>
-        <ListsInviteButton>Invite</ListsInviteButton>
+        <AddUser boardId={boardFromServer._id} />
       </ListsHeader>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="lists" direction="horizontal">
@@ -297,7 +300,7 @@ const Lists = () => {
                 />
               ))}
               {provided.placeholder}
-              <ListForm boardId={boardFromServer._id} />
+              <ListForm boardId={boardFromServer._id} setLists={setLists} />
             </ListsContainer>
           )}
         </Droppable>

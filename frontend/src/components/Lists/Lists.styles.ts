@@ -24,9 +24,9 @@ export const ListsContainer = styled.div`
 
 export const ListsHeader = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
   background-color: #5E251B;
+  gap: 20px;
 `;
 
 export const ListsInviteButton = styled.button`

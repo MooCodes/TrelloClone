@@ -14,11 +14,12 @@ export const ListContainer = styled.div`
 `;
 
 export const ListTitle = styled.h3`
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   color: #B6C2CF;
   margin: 0;
   padding: 10px;
+  padding-left: 20px;
 `;
 
 export const CardsContainer = styled.div`

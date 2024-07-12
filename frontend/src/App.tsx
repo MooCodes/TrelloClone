@@ -5,6 +5,8 @@ import Boards from "./components/Boards/Boards";
 import Lists from "./components/Lists/Lists";
 import "@fontsource/roboto";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { socket } from "./socket";
+import { useEffect } from "react";
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -40,8 +42,13 @@ const queryClient = new QueryClient({
   },
 });
 
-
 function App() {
+  useEffect(() => {
+    socket.on("connect", () => {
+      console.log("Connected to server");
+    });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <GlobalStyles />

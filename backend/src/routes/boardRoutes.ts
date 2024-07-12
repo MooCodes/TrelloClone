@@ -14,7 +14,7 @@ const router = Router();
 router.post("/", auth, createBoard);
 router.get("/", auth, getBoards);
 router.get("/:boardId", auth, getBoard);
-router.post("/:boardId/addUser", auth, addUserToBoard);
+router.post("/:boardId/users", auth, addUserToBoard);
 router.put("/:boardId", auth, updateBoard);
 router.delete("/:boardId", auth, deleteBoard);
 

@@ -9,20 +9,32 @@ import listRouter from "./routes/listRoutes";
 import cardRouter from "./routes/cardRoutes";
 
 const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+export const httpServer = http.createServer(app);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:5173",
+  },
+});
 
 connectDB();
 
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  console.log("a user connected, socket id: ", socket.id);
 
-  socket.on("joinBoard", (boardId) => {
+  socket.join("test");
+
+  socket.on("joinRoom", async (boardId) => {
+    console.log("joining board: ", boardId);
     socket.join(boardId);
   });
 
-  socket.on("addList", (list) => {
-    socket.to(list.board._id).emit("listAdded", list);
+  socket.on("refreshList", (boardId) => {
+    console.log("adding list: ", boardId);
+
+    const clients = io.sockets.adapter.rooms.get(boardId);
+    console.log(clients);
+
+    io.to(boardId).emit("addList");
   });
 
   socket.on("disconnect", () => {

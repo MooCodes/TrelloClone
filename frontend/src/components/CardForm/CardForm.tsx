@@ -8,7 +8,12 @@ import {
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
-const CardForm = ({ listId, boardId }: { listId: string; boardId: string }) => {
+interface ICardFormProps {
+  listId: string;
+  boardId: string;
+}
+
+const CardForm = ({ listId, boardId }: ICardFormProps) => {
   const queryClient = useQueryClient();
   const [title, setTitle] = useState("");
   const token = localStorage.getItem("trello-clone-token");
@@ -39,7 +44,7 @@ const CardForm = ({ listId, boardId }: { listId: string; boardId: string }) => {
     <CardFormContainer onSubmit={onSubmit}>
       <CardTitleContainer>
         <CardTitleInput
-          placeholder="Enter card title..."
+          placeholder="Enter a title for this card..."
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />

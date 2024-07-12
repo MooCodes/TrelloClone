@@ -12,6 +12,7 @@ export const CardContainer = styled.div`
 
 export const CardTitle = styled.h3`
   font-size: 14px;
+  font-weight: normal;
   color: #B6C2CF;
   margin: 0;
 `;

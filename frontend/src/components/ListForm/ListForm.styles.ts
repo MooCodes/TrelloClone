@@ -18,7 +18,9 @@ export const ListTitleInput = styled.input`
   background-color: #22272b;
   margin: 0;
   border: none;
+  border-radius: 4px;
   color: #b6c2cf;
+  padding: 5px;
 `;
 
 export const ListFormButton = styled.button`
