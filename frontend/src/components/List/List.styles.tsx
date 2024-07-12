@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const ListContainer = styled.div`
   display: flex;
@@ -16,10 +16,9 @@ export const ListContainer = styled.div`
 export const ListTitle = styled.h3`
   font-size: 14px;
   font-weight: bold;
-  color: #B6C2CF;
+  color: #b6c2cf;
   margin: 0;
-  padding: 10px;
-  padding-left: 20px;
+  padding: 15px 10px 10px 20px;
 `;
 
 export const CardsContainer = styled.div`

@@ -32,18 +32,10 @@ io.on("connection", (socket) => {
     console.log("refreshing list for board: ", boardId);
 
     const clients = io.sockets.adapter.rooms.get(boardId);
-    console.log(clients);
-
-    // io.to(boardId).emit("refreshLists");
 
     // send to all clients in the room except the sender
     clients!.forEach((socketId) => {
-      if (socket.id !== socketId) {
-        console.log("sending refreshLists to: ", socketId);
-        io.to(socketId).emit("refreshLists");
-      } else {
-        console.log("not sending refreshLists to: ", socketId);
-      }
+      if (socket.id !== socketId) io.to(socketId).emit("refreshLists");
     });
   });
 
