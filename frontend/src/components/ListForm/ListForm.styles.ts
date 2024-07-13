@@ -71,11 +71,11 @@ export const ListFormButtonContainer = styled.div`
 export const StyledFontAwesomeIcon = styled(FontAwesomeIcon)`
   cursor: pointer;
   color: #b6c2cf;
-  padding: 5px;
+  padding: 10px;
   margin-top: 10px;
 
   &:hover {
-    color: #fff;
     border-color: #007bff;
+    background-color: rgba(50, 50, 50, 0.8);
   }
 `;

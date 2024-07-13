@@ -5,6 +5,7 @@ export interface ICard {
   _id: string;
   title: string;
   index: number;
+  list: string;
 }
 
 const Card = ({ title, _id, index }: ICard) => {

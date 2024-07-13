@@ -12,9 +12,18 @@ import axios from "axios";
 import { socket } from "../../socket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { addList, updateNewListId } from "../../redux/slices/listsSlice";
+import { IList } from "../List/List";
+import { IBoard } from "../Board/Board";
 
 interface IListFormProps {
   boardId: string;
+}
+
+interface IListsAndBoard {
+  board: IBoard;
+  lists: IList[];
 }
 
 const ListForm = ({ boardId }: IListFormProps) => {
@@ -22,6 +31,9 @@ const ListForm = ({ boardId }: IListFormProps) => {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [title, setTitle] = useState("");
+
+  const lists = useAppSelector((state) => state.lists.lists);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -53,11 +65,29 @@ const ListForm = ({ boardId }: IListFormProps) => {
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
       console.log("success");
-      setIsFormVisible(false);
+      // queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      const oldListsAndBoard = queryClient.getQueryData([
+        "listsAndBoard",
+        boardId,
+      ]) as IListsAndBoard;
+
+      const newListsAndBoard = {
+        ...oldListsAndBoard,
+        lists: [...oldListsAndBoard.lists, data],
+      };
+
+      queryClient.setQueryData(["listsAndBoard", boardId], newListsAndBoard);
+
       setTitle("");
-      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      console.log("data", data);
+
+      dispatch(updateNewListId(data));
+
+      console.log("lists", lists);
 
       socket.emit("refreshLists", boardId);
     },
@@ -65,8 +95,22 @@ const ListForm = ({ boardId }: IListFormProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    
+
+    const newList: IList = {
+      _id: "0", // need this so droppable wont throw an error
+      title,
+      cards: [],
+      index: lists.length,
+      boardId: boardId,
+    };
+
+    dispatch(addList(newList));
+
     mutation.mutate();
+
+    setIsFormVisible(false);
+
+    console.log("sending");
   };
 
   if (!isFormVisible) {
@@ -89,7 +133,6 @@ const ListForm = ({ boardId }: IListFormProps) => {
         <ListFormButtonContainer>
           <ListFormButton>Add List</ListFormButton>
           <StyledFontAwesomeIcon
-            size="lg"
             icon={faX}
             onClick={() => setIsFormVisible(false)}
           />

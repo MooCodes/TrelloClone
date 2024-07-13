@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 import axios from "axios";
@@ -10,6 +10,8 @@ import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { ICard } from "../Card/Card";
 import AddUser from "../AddUser/AddUser";
 import { socket } from "../../socket";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { setLists, updateCardsIndex, updateListsIndex } from "../../redux/slices/listsSlice";
 
 export interface IListsAndBoard {
   board: IBoard;
@@ -19,8 +21,10 @@ export interface IListsAndBoard {
 const Lists = () => {
   const { boardId } = useParams();
   const token = localStorage.getItem("trello-clone-token");
-  const [lists, setLists] = useState<IList[]>([]);
   const queryClient = useQueryClient();
+
+  const lists = useAppSelector((state) => state.lists.lists);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     console.log("emitting joinRoom event");
@@ -74,7 +78,10 @@ const Lists = () => {
         }
       );
     },
-    onSuccess: () => {
+    onSuccess: ({ data }) => {
+      console.log("data", data);
+      console.log("updating the react query cache");
+
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
       socket.emit("refreshLists", boardId);
@@ -135,9 +142,9 @@ const Lists = () => {
 
   useEffect(() => {
     if (query.data) {
-      setLists(query.data.lists);
+      dispatch(setLists(query.data.lists));
     }
-  }, [query.data]);
+  }, [query.data, dispatch]);
 
   if (query.isLoading) {
     return null;
@@ -177,14 +184,15 @@ const Lists = () => {
       // reorder the lists in our local state
       const reorderedLists = [...lists];
 
+      console.log("reorderedLists", reorderedLists);
+
       const [reorderedItem] = reorderedLists.splice(sourceIndex, 1);
       reorderedLists.splice(destinationIndex, 0, reorderedItem);
 
-      reorderedLists.forEach((list, index) => {
-        list.index = index;
-      });
+      dispatch(setLists(reorderedLists));
+      dispatch(updateListsIndex());
 
-      setLists(reorderedLists);
+      console.log("lists", lists);
 
       listMutation.mutate({
         sourceList,
@@ -210,9 +218,9 @@ const Lists = () => {
       const [reorderedItem] = reorderedCards.splice(sourceIndex, 1);
       reorderedCards.splice(destinationIndex, 0, reorderedItem);
 
-      reorderedCards.forEach((card, index) => {
-        card.index = index;
-      });
+      // reorderedCards.forEach((card, index) => {
+      //   card.index = index;
+      // });
 
       const newLists = reorderedLists.map((list) => {
         const newList = { ...list };
@@ -222,7 +230,8 @@ const Lists = () => {
         return newList;
       });
 
-      setLists(newLists);
+      dispatch(setLists(newLists));
+      dispatch(updateCardsIndex());
 
       cardMutation.mutate({
         sourceCard,
@@ -252,13 +261,13 @@ const Lists = () => {
       const [reorderedItem] = reorderedSourceCards.splice(sourceIndex, 1);
       reorderedDestinationCards.splice(destinationIndex, 0, reorderedItem);
 
-      reorderedSourceCards.forEach((card, index) => {
-        card.index = index;
-      });
+      // reorderedSourceCards.forEach((card, index) => {
+      //   card.index = index;
+      // });
 
-      reorderedDestinationCards.forEach((card, index) => {
-        card.index = index;
-      });
+      // reorderedDestinationCards.forEach((card, index) => {
+      //   card.index = index;
+      // });
 
       const newLists = reorderedLists.map((list) => {
         const newList = { ...list };
@@ -271,7 +280,8 @@ const Lists = () => {
         return newList;
       });
 
-      setLists(newLists);
+      dispatch(setLists(newLists));
+      dispatch(updateCardsIndex());
 
       cardMutationToList.mutate({
         card: sourceCard,
@@ -280,6 +290,8 @@ const Lists = () => {
       });
     }
   };
+
+  console.log("lists", lists);
 
   return (
     <div

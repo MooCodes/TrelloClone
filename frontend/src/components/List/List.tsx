@@ -4,7 +4,7 @@ import CardForm from "../CardForm/CardForm";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 
 export interface IList {
-  _id: string;
+  _id?: string;
   title: string;
   cards: ICard[];
   index: number;
@@ -13,12 +13,12 @@ export interface IList {
 
 const List = ({ _id, title, index, cards, boardId }: IList) => {
   return (
-    <Draggable key={_id} draggableId={_id} index={index}>
+    <Draggable key={_id} draggableId={_id!} index={index}>
       {(provided) => (
         <>
           <ListContainer {...provided.draggableProps} ref={provided.innerRef}>
             <ListTitle {...provided.dragHandleProps}>{title}</ListTitle>
-            <Droppable type="cards" droppableId={_id} direction="vertical">
+            <Droppable type="cards" droppableId={_id!} direction="vertical">
               {(provided) => (
                 <CardsContainer
                   {...provided.droppableProps}
@@ -30,6 +30,7 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
                       _id={card._id}
                       title={card.title}
                       index={card.index}
+                      list={card.list}
                     />
                   ))}
                   {provided.placeholder}
