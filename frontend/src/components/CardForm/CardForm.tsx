@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   CardButton,
   CardFormContainer,
@@ -6,7 +6,7 @@ import {
   CardTitleContainer,
   ShowCardForm,
   StyledFontAwesomeIcon,
-  CardButtonFormContainer
+  CardButtonFormContainer,
 } from "./CardForm.styles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -16,6 +16,8 @@ import { addCardToList, updateNewCardId } from "../../redux/slices/listsSlice";
 import { ICard } from "../Card/Card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
+import useClickOutside from "../../hooks/useClickOutside";
+import useAutosizeTextArea from "../../hooks/useAutosizeTextArea";
 
 interface ICardFormProps {
   listId: string;
@@ -31,6 +33,21 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
   const dispatch = useAppDispatch();
   const lists = useAppSelector((state) => state.lists.lists);
+
+  const wrapperRef = useClickOutside(() => {
+    setIsFormVisible(false);
+    setTitle("");
+  });
+
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  useAutosizeTextArea(textAreaRef, title);
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = event.target.value;
+
+    setTitle(val);
+  };
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -50,6 +67,9 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
       dispatch(updateNewCardId(data));
 
+      // update the lists
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
       socket.emit("refreshLists", boardId);
     },
   });
@@ -61,6 +81,10 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
     const list = lists.find((list) => list._id === listId);
 
     if (!list) {
+      return;
+    }
+
+    if (!title) {
       return;
     }
 
@@ -88,22 +112,29 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
   }
 
   return (
-    <CardFormContainer onSubmit={onSubmit}>
-      <CardTitleContainer>
-        <CardTitleInput
-          placeholder="Enter a title for this card..."
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-      </CardTitleContainer>
-      <CardButtonFormContainer>
-        <CardButton>Add Card</CardButton>
-        <StyledFontAwesomeIcon
-          icon={faX}
-          onClick={() => setIsFormVisible(false)}
-        />
-      </CardButtonFormContainer>
-    </CardFormContainer>
+    <div ref={wrapperRef}>
+      <CardFormContainer onSubmit={onSubmit}>
+        <CardTitleContainer>
+          <CardTitleInput
+            ref={textAreaRef}
+            autoFocus
+            placeholder="Enter a title for this card..."
+            value={title}
+            onChange={handleChange}
+          />
+        </CardTitleContainer>
+        <CardButtonFormContainer>
+          <CardButton>Add Card</CardButton>
+          <StyledFontAwesomeIcon
+            icon={faX}
+            onClick={() => {
+              setTitle("");
+              setIsFormVisible(false);
+            }}
+          />
+        </CardButtonFormContainer>
+      </CardFormContainer>
+    </div>
   );
 };
 

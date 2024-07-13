@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ListFormContainer,
@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { addList, updateNewListId } from "../../redux/slices/listsSlice";
 import { IList } from "../List/List";
 import { IBoard } from "../Board/Board";
+import useClickOutside from "../../hooks/useClickOutside";
 
 interface IListFormProps {
   boardId: string;
@@ -28,28 +29,16 @@ interface IListsAndBoard {
 
 const ListForm = ({ boardId }: IListFormProps) => {
   const queryClient = useQueryClient();
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [title, setTitle] = useState("");
 
   const lists = useAppSelector((state) => state.lists.lists);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setIsFormVisible(false);
-        setTitle("");
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+  const wrapperRef = useClickOutside(() => {
+    setIsFormVisible(false);
+    setTitle("");
+  });
 
   const mutation = useMutation({
     mutationFn: () => {
@@ -66,9 +55,6 @@ const ListForm = ({ boardId }: IListFormProps) => {
       );
     },
     onSuccess: ({ data }) => {
-      console.log("success");
-      // queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
-
       const oldListsAndBoard = queryClient.getQueryData([
         "listsAndBoard",
         boardId,
@@ -83,11 +69,7 @@ const ListForm = ({ boardId }: IListFormProps) => {
 
       setTitle("");
 
-      console.log("data", data);
-
       dispatch(updateNewListId(data));
-
-      console.log("lists", lists);
 
       socket.emit("refreshLists", boardId);
     },
@@ -95,6 +77,10 @@ const ListForm = ({ boardId }: IListFormProps) => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!title) {
+      return;
+    }
 
     const newList: IList = {
       _id: "0", // need this so droppable wont throw an error
@@ -126,6 +112,7 @@ const ListForm = ({ boardId }: IListFormProps) => {
     <div style={{ height: "100%" }} ref={wrapperRef}>
       <ListFormContainer onSubmit={handleSubmit}>
         <ListTitleInput
+          autoFocus
           placeholder="Enter list title..."
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -134,7 +121,10 @@ const ListForm = ({ boardId }: IListFormProps) => {
           <ListFormButton>Add List</ListFormButton>
           <StyledFontAwesomeIcon
             icon={faX}
-            onClick={() => setIsFormVisible(false)}
+            onClick={() => {
+              setTitle("");
+              setIsFormVisible(false);
+            }}
           />
         </ListFormButtonContainer>
       </ListFormContainer>

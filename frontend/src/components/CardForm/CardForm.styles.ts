@@ -16,7 +16,7 @@ export const CardTitleContainer = styled.div`
   align-items: center;
 `;
 
-export const CardTitleInput = styled.input`
+export const CardTitleInput = styled.textarea`
   background-color: #22272b;
   border: none;
   font-size: 14px;
@@ -24,6 +24,11 @@ export const CardTitleInput = styled.input`
   color: #b6c2cf;
   margin: 0;
   width: 100%;
+  min-height: 21px;
+  height: 100%;
+  overflow: hidden;
+
+  resize: none;
 
   &:focus {
     outline: none;
@@ -41,6 +46,10 @@ export const CardButton = styled.button`
   font-weight: bold;
   cursor: pointer;
   margin-top: 10px;
+
+  &:hover {
+    background-color: #6eb5ff;
+  }
 `;
 
 export const ShowCardForm = styled.div`
@@ -55,6 +64,7 @@ export const ShowCardForm = styled.div`
   margin-bottom: 10px;
   height: 100%;
   width: 230px;
+  cursor: pointer;
 
   span {
     font-weight: bold;

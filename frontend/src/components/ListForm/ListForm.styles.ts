@@ -22,6 +22,10 @@ export const ListTitleInput = styled.input`
   color: #8c9bab;
   padding: 5px;
   padding-left: 10px;
+
+  &:focus {
+    outline-color: #3f4b5a;
+  }
 `;
 
 export const ListFormButton = styled.button`
@@ -36,6 +40,10 @@ export const ListFormButton = styled.button`
   cursor: pointer;
   margin-top: 10px;
   font-weight: bold;
+
+  &:hover {
+    background-color: #6eb5ff;
+  }
 `;
 
 export const ShowListForm = styled.div`
