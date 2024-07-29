@@ -15,16 +15,10 @@ import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { addList, updateNewListId } from "../../redux/slices/listsSlice";
 import { IList } from "../List/List";
-import { IBoard } from "../Board/Board";
 import useClickOutside from "../../hooks/useClickOutside";
 
 interface IListFormProps {
   boardId: string;
-}
-
-interface IListsAndBoard {
-  board: IBoard;
-  lists: IList[];
 }
 
 const ListForm = ({ boardId }: IListFormProps) => {
@@ -55,21 +49,11 @@ const ListForm = ({ boardId }: IListFormProps) => {
       );
     },
     onSuccess: ({ data }) => {
-      const oldListsAndBoard = queryClient.getQueryData([
-        "listsAndBoard",
-        boardId,
-      ]) as IListsAndBoard;
-
-      const newListsAndBoard = {
-        ...oldListsAndBoard,
-        lists: [...oldListsAndBoard.lists, data],
-      };
-
-      queryClient.setQueryData(["listsAndBoard", boardId], newListsAndBoard);
-
       setTitle("");
 
       dispatch(updateNewListId(data));
+
+      queryClient.refetchQueries({ queryKey: ["listsAndBoard", boardId] });
 
       socket.emit("refreshLists", boardId);
     },

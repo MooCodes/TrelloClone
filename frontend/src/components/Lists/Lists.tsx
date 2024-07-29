@@ -11,7 +11,11 @@ import { ICard } from "../Card/Card";
 import AddUser from "../AddUser/AddUser";
 import { socket } from "../../socket";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
-import { setLists, updateCardsIndex, updateListsIndex } from "../../redux/slices/listsSlice";
+import {
+  setLists,
+  updateCardsIndex,
+  updateListsIndex,
+} from "../../redux/slices/listsSlice";
 
 export interface IListsAndBoard {
   board: IBoard;
@@ -133,8 +137,8 @@ const Lists = () => {
         }
       );
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+    onSuccess: ({ data }) => {
+      console.log("data", data);
 
       socket.emit("refreshLists", boardId);
     },

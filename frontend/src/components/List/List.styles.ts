@@ -1,3 +1,4 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
 
 export const ListContainer = styled.div`
@@ -11,6 +12,26 @@ export const ListContainer = styled.div`
   overflow-y: auto;
   margin-right: 20px;
   margin-bottom: 20px;
+`;
+
+export const ListHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+`;
+
+export const StyledEllipsis = styled(FontAwesomeIcon)`
+  color: #b6c2cf;
+  margin-right: 10px;
+  margin-top: 5px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 10px;
+
+  &:hover {
+    border-color: #007bff;
+    background-color: rgba(50, 50, 50, 0.8);
+  }
 `;
 
 export const ListTitle = styled.h3`

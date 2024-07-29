@@ -144,9 +144,7 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
       $push: { cards: cardId },
     });
 
-    const updatedCard = await Card.findById(cardId);
-
-    res.status(200).json(updatedCard);
+    res.status(200).json({ message: "Card moved successfully" });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
