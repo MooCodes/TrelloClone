@@ -4,6 +4,7 @@ import {
   ListTitle,
   ListHeader,
   StyledEllipsis,
+  ListTitleInput,
 } from "./List.styles";
 import Card, { ICard } from "../Card/Card";
 import CardForm from "../CardForm/CardForm";
@@ -11,6 +12,11 @@ import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { useState, useRef } from "react";
 import ListActions from "../ListActions/ListActions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { updateListTitle } from "../../redux/slices/listsSlice";
+import { socket } from "../../socket";
 
 export interface IList {
   _id: string;
@@ -23,11 +29,70 @@ export interface IList {
 const List = ({ _id, title, index, cards, boardId }: IList) => {
   const elementRef = useRef<HTMLDivElement>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [newTitle, setNewTitle] = useState(title);
+
+  const lists = useAppSelector((state) => state.lists.lists);
+  const dispatch = useAppDispatch();
+
+  const queryClient = useQueryClient();
+
+  const editMutation = useMutation({
+    mutationFn: () => {
+      return axios.put(
+        `http://localhost:5000/api/lists/${_id}`,
+        { title: newTitle },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(
+              "trello-clone-token"
+            )}`,
+          },
+        }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+
+      socket.emit("refreshLists", boardId);
+    },
+  });
 
   const handleEllipsis = () => {
     console.log("ellipsis clicked");
 
     setShowDropdown(!showDropdown);
+  };
+
+  const handleEditClick = () => {
+    console.log("edit title clicked");
+    setEditMode(!editMode);
+  };
+
+  const handleOnKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      // update list title in local state
+
+      // find the list in the state
+      const list = lists.find((list) => list._id === _id);
+      if (!list) {
+        return;
+      }
+
+      // create a new list
+      const newList = {
+        ...list,
+        title: newTitle,
+      };
+
+      // update the state
+      dispatch(updateListTitle(newList));
+
+      setEditMode(false);
+
+      // update list title on the server via mutation
+      editMutation.mutate();
+    }
   };
 
   return (
@@ -36,7 +101,17 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
         <div ref={elementRef} style={{ height: "100%" }}>
           <ListContainer {...provided.draggableProps} ref={provided.innerRef}>
             <ListHeader {...provided.dragHandleProps}>
-              <ListTitle>{title}</ListTitle>
+              {editMode ? (
+                <ListTitleInput
+                  autoFocus
+                  onBlur={handleEditClick}
+                  value={newTitle}
+                  onChange={(e) => setNewTitle(e.target.value)}
+                  onKeyDown={handleOnKeyDown}
+                />
+              ) : (
+                <ListTitle onClick={handleEditClick}>{title}</ListTitle>
+              )}
               <StyledEllipsis
                 icon={faEllipsisH}
                 onClick={handleEllipsis}

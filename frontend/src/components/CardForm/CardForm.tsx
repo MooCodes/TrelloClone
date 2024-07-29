@@ -40,6 +40,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
   });
 
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
 
   useAutosizeTextArea(textAreaRef, title);
 
@@ -113,7 +114,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
   return (
     <div ref={wrapperRef}>
-      <CardFormContainer onSubmit={onSubmit}>
+      <CardFormContainer ref={formRef} onSubmit={onSubmit}>
         <CardTitleContainer>
           <CardTitleInput
             ref={textAreaRef}
@@ -121,6 +122,12 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
             placeholder="Enter a title for this card..."
             value={title}
             onChange={handleChange}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                formRef.current?.requestSubmit();
+              }
+            }}
           />
         </CardTitleContainer>
         <CardButtonFormContainer>

@@ -25,6 +25,14 @@ export const boardsSlice = createSlice({
     addList: (state, action: PayloadAction<IList>) => {
       state.lists = [...state.lists, action.payload];
     },
+    updateListTitle: (state, action: PayloadAction<IList>) => {
+      state.lists = state.lists.map((list) => {
+        if (list._id === action.payload._id) {
+          return action.payload;
+        }
+        return list;
+      });
+    },
     updateNewListId: (state, action: PayloadAction<IList>) => {
       state.lists = state.lists.map((list) => {
         if (list._id === "0") {
@@ -92,6 +100,7 @@ export const {
   addCardToList,
   updateNewCardId,
   updateCardsIndex,
+  updateListTitle,
 } = boardsSlice.actions;
 
 export default boardsSlice.reducer;

@@ -18,6 +18,7 @@ export const ListHeader = styled.div`
   display: flex;
   justify-content: space-between;
   flex-direction: row;
+  margin-bottom: 5px;
 `;
 
 export const StyledEllipsis = styled(FontAwesomeIcon)`
@@ -39,7 +40,26 @@ export const ListTitle = styled.h3`
   font-weight: bold;
   color: #b6c2cf;
   margin: 0;
+  width: 100%;
   padding: 15px 10px 10px 20px;
+`;
+
+export const ListTitleInput = styled.input`
+  font-size: 14px;
+  width: 100%;
+  font-weight: bold;
+  background-color: #22272b;
+  color: #b6c2cf;
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-bottom: 5px;
+  padding: 5px;
+  border: none;
+  border-radius: 4px;
+
+  &:focus {
+    outline-color: #3f4b5a;
+  }
 `;
 
 export const CardsContainer = styled.div`
