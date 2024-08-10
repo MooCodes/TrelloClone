@@ -51,7 +51,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
   const mutation = useMutation({
     mutationFn: CardsService.createCard,
-    onSuccess: ({ data }) => {
+    onSuccess: (data) => {
       console.log(" data", data);
       setTitle("");
 
