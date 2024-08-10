@@ -3,7 +3,7 @@ import { BoardsContainer } from "./Boards.styles";
 import Board, { IBoard } from "../Board/Board";
 import BoardForm from "../BoardForm/BoardForm";
 import { useQuery } from "@tanstack/react-query";
-import { fetchBoards } from "../../services/boards";
+import BoardsService from "../../services/boards";
 
 const Boards = () => {
   // store the boards as client state for re-rendering when the board is moved and looks good (no lags)
@@ -11,7 +11,7 @@ const Boards = () => {
 
   const query = useQuery({
     queryKey: ["boards"],
-    queryFn: fetchBoards,
+    queryFn: BoardsService.getBoards,
   });
 
   useEffect(() => {

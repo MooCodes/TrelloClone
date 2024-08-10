@@ -9,7 +9,6 @@ import {
   CardButtonFormContainer,
 } from "./CardForm.styles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { socket } from "../../socket";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { addCardToList, updateNewCardId } from "../../redux/slices/listsSlice";
@@ -18,6 +17,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
 import useClickOutside from "../../hooks/useClickOutside";
 import useAutosizeTextArea from "../../hooks/useAutosizeTextArea";
+import CardsService from "../../services/cards";
 
 interface ICardFormProps {
   listId: string;
@@ -29,7 +29,6 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
   const queryClient = useQueryClient();
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [title, setTitle] = useState("");
-  const token = localStorage.getItem("trello-clone-token");
 
   const dispatch = useAppDispatch();
   const lists = useAppSelector((state) => state.lists.lists);
@@ -51,17 +50,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
   };
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return axios.post(
-        `http://localhost:5000/api/cards/${listId}`,
-        { title },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    },
+    mutationFn: CardsService.createCard,
     onSuccess: ({ data }) => {
       console.log(" data", data);
       setTitle("");
@@ -100,7 +89,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
     setIsFormVisible(false);
 
-    mutation.mutate();
+    mutation.mutate({ title, listId });
   };
 
   if (!isFormVisible) {

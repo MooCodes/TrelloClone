@@ -13,10 +13,10 @@ import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
 import { useState, useRef } from "react";
 import ListActions from "../ListActions/ListActions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { updateListTitle } from "../../redux/slices/listsSlice";
 import { socket } from "../../socket";
+import ListsService from "../../services/lists";
 
 export interface IList {
   _id: string;
@@ -38,19 +38,7 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
   const queryClient = useQueryClient();
 
   const editMutation = useMutation({
-    mutationFn: () => {
-      return axios.put(
-        `http://localhost:5000/api/lists/${_id}`,
-        { title: newTitle },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              "trello-clone-token"
-            )}`,
-          },
-        }
-      );
-    },
+    mutationFn: ListsService.updateList,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
@@ -91,7 +79,7 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
       setEditMode(false);
 
       // update list title on the server via mutation
-      editMutation.mutate();
+      editMutation.mutate({ listId: _id, title: newTitle });
     }
   };
 

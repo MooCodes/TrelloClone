@@ -91,7 +91,7 @@ export const getCards = async (req: AuthRequest, res: Response) => {
 export const moveCardToList = async (req: AuthRequest, res: Response) => {
   const cardId = req.params.cardId;
   const listId = req.params.listId;
-  const index = req.params.index;
+  const index = req.body.index;
 
   try {
     const card = await Card.findById(cardId);
@@ -153,8 +153,8 @@ export const moveCardToList = async (req: AuthRequest, res: Response) => {
 };
 
 export const moveCard = async (req: AuthRequest, res: Response) => {
-  const sourceCardId = req.params.sourceCardId;
-  const destinationIndex = Number(req.params.destinationIndex);
+  const sourceCardId = req.params.cardId;
+  const destinationIndex = Number(req.body.index);
 
   try {
     const sourceCard = await Card.findById(sourceCardId);

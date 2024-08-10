@@ -14,12 +14,12 @@ const AddUserForm = ({ boardId }: IAddUserProps) => {
     setEmail(e.target.value);
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     console.log("email", email);
-    
-    await addUser.mutate();
+
+    addUser.mutate();
 
     setEmail(""); // Clear the input after submission
   };

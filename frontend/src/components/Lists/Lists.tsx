@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
-import axios from "axios";
 import List, { IList } from "../List/List";
 import { IBoard } from "../Board/Board";
 import { BoardName, ListsContainer, ListsHeader } from "./Lists.styles";
@@ -16,6 +15,8 @@ import {
   updateCardsIndex,
   updateListsIndex,
 } from "../../redux/slices/listsSlice";
+import BoardsService from "../../services/boards";
+import ListsService from "../../services/lists";
 
 export interface IListsAndBoard {
   board: IBoard;
@@ -24,7 +25,6 @@ export interface IListsAndBoard {
 
 const Lists = () => {
   const { boardId } = useParams();
-  const token = localStorage.getItem("trello-clone-token");
   const queryClient = useQueryClient();
 
   const lists = useAppSelector((state) => state.lists.lists);
@@ -45,43 +45,19 @@ const Lists = () => {
     queryKey: ["listsAndBoard", boardId],
     queryFn: async () => {
       const [boardResponse, listsResponse] = await Promise.all([
-        axios.get(`http://localhost:5000/api/boards/${boardId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
-        axios.get(`http://localhost:5000/api/lists/${boardId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }),
+        BoardsService.getBoard(boardId!),
+        ListsService.getLists(boardId!),
       ]);
 
       return {
-        board: boardResponse.data as IBoard,
-        lists: listsResponse.data as IList[],
+        board: boardResponse as IBoard,
+        lists: listsResponse as IList[],
       };
     },
   });
 
-  const listMutation = useMutation({
-    mutationFn: ({
-      sourceList,
-      destinationIndex,
-    }: {
-      sourceList: IList;
-      destinationIndex: number;
-    }) => {
-      return axios.put(
-        `http://localhost:5000/api/lists/${sourceList._id}/${destinationIndex}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    },
+  const listMoveMutation = useMutation({
+    mutationFn: ListsService.moveList,
     onSuccess: ({ data }) => {
       console.log("data", data);
       console.log("updating the react query cache");
@@ -92,24 +68,8 @@ const Lists = () => {
     },
   });
 
-  const cardMutation = useMutation({
-    mutationFn: ({
-      sourceCard,
-      destinationIndex,
-    }: {
-      sourceCard: ICard;
-      destinationIndex: number;
-    }) => {
-      return axios.put(
-        `http://localhost:5000/api/cards/${sourceCard._id}/${destinationIndex}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    },
+  const cardMoveMutation = useMutation({
+    mutationFn: ListsService.moveCard,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
@@ -117,26 +77,8 @@ const Lists = () => {
     },
   });
 
-  const cardMutationToList = useMutation({
-    mutationFn: ({
-      card,
-      list,
-      index,
-    }: {
-      card: ICard;
-      list: IList;
-      index: number;
-    }) => {
-      return axios.put(
-        `http://localhost:5000/api/cards/${card._id}/${list._id}/${index}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    },
+  const cardMoveToListMutation = useMutation({
+    mutationFn: ListsService.moveCardToList,
     onSuccess: ({ data }) => {
       console.log("data", data);
 
@@ -198,9 +140,9 @@ const Lists = () => {
 
       console.log("lists", lists);
 
-      listMutation.mutate({
-        sourceList,
-        destinationIndex,
+      listMoveMutation.mutate({
+        listId: sourceList._id,
+        index: destinationIndex,
       });
     } else if (result.source.droppableId === result.destination.droppableId) {
       // if dragging cards between the same list
@@ -222,10 +164,6 @@ const Lists = () => {
       const [reorderedItem] = reorderedCards.splice(sourceIndex, 1);
       reorderedCards.splice(destinationIndex, 0, reorderedItem);
 
-      // reorderedCards.forEach((card, index) => {
-      //   card.index = index;
-      // });
-
       const newLists = reorderedLists.map((list) => {
         const newList = { ...list };
         if (list._id === result.source.droppableId) {
@@ -237,9 +175,9 @@ const Lists = () => {
       dispatch(setLists(newLists));
       dispatch(updateCardsIndex());
 
-      cardMutation.mutate({
-        sourceCard,
-        destinationIndex,
+      cardMoveMutation.mutate({
+        cardId: sourceCard._id,
+        index: destinationIndex,
       });
     } else if (result.source.droppableId !== result.destination.droppableId) {
       // if changing cards between different lists
@@ -265,14 +203,6 @@ const Lists = () => {
       const [reorderedItem] = reorderedSourceCards.splice(sourceIndex, 1);
       reorderedDestinationCards.splice(destinationIndex, 0, reorderedItem);
 
-      // reorderedSourceCards.forEach((card, index) => {
-      //   card.index = index;
-      // });
-
-      // reorderedDestinationCards.forEach((card, index) => {
-      //   card.index = index;
-      // });
-
       const newLists = reorderedLists.map((list) => {
         const newList = { ...list };
         if (list._id === result.source.droppableId) {
@@ -287,9 +217,9 @@ const Lists = () => {
       dispatch(setLists(newLists));
       dispatch(updateCardsIndex());
 
-      cardMutationToList.mutate({
-        card: sourceCard,
-        list: destinationList,
+      cardMoveToListMutation.mutate({
+        cardId: sourceCard._id,
+        listId: destinationList._id,
         index: destinationIndex,
       });
     }

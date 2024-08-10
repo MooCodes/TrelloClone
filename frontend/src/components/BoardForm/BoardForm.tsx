@@ -4,38 +4,26 @@ import {
   BoardTitleInput,
   BoardAddButton,
 } from "./BoardForm.styles";
-import axios from "axios";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import BoardsService from "../../services/boards";
 
 const BoardForm = () => {
   const [name, setName] = useState("");
   const queryClient = useQueryClient();
   const mutation = useMutation({
-    mutationFn: () => {
-      return axios.post(
-        "http://localhost:5000/api/boards",
-        { name },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              "trello-clone-token"
-            )}`,
-          },
-        }
-      );
-    },
-    onSuccess: ()=> {
+    mutationFn: BoardsService.createBoard,
+    onSuccess: () => {
       setName("");
       queryClient.invalidateQueries({
         queryKey: ["boards"],
-      })
+      });
     },
   });
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    mutation.mutate();
+    mutation.mutate(name);
   };
 
   return (

@@ -8,8 +8,8 @@ import {
   ListActionDelete,
 } from "./ListActions.styles";
 import { faX } from "@fortawesome/free-solid-svg-icons";
-import axios from "axios";
 import { socket } from "../../socket";
+import ListsService from "../../services/lists";
 
 interface IProps {
   listId: string;
@@ -33,13 +33,7 @@ const ListActions = ({ listId, boardId, setShowDropdown, listRef }: IProps) => {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: () => {
-      return axios.delete(`http://localhost:5000/api/lists/${listId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("trello-clone-token")}`,
-        },
-      });
-    },
+    mutationFn: ListsService.deleteList,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
@@ -50,9 +44,7 @@ const ListActions = ({ listId, boardId, setShowDropdown, listRef }: IProps) => {
   });
 
   const handleDelete = () => {
-    // make a delete request here
-
-    deleteMutation.mutate();
+    deleteMutation.mutate(listId);
   };
 
   if (listPosition === undefined) {

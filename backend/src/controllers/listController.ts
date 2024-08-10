@@ -93,7 +93,7 @@ export const getLists = async (req: AuthRequest, res: Response) => {
 
 export const moveList = async (req: AuthRequest, res: Response) => {
   const sourceListId = req.params.sourceListId;
-  const destinationIndex = Number(req.params.destinationIndex);
+  const destinationIndex = Number(req.body.index);
 
   try {
     const sourceList = await List.findById(sourceListId);

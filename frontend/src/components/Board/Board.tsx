@@ -7,7 +7,7 @@ import {
 } from "./Board.styles";
 import { useNavigate } from "react-router-dom";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import BoardsService from "../../services/boards";
 
 export interface IBoard {
   _id: string;
@@ -19,13 +19,7 @@ const Board = ({ _id, name }: IBoard) => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return axios.delete(`http://localhost:5000/api/boards/${_id}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("trello-clone-token")}`,
-        },
-      });
-    },
+    mutationFn: BoardsService.deleteBoard,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["boards"],
@@ -36,7 +30,7 @@ const Board = ({ _id, name }: IBoard) => {
   const onDelete = () => {
     // delete board
     console.log("clicked delete button");
-    mutation.mutate();
+    mutation.mutate(_id);
   };
 
   return (

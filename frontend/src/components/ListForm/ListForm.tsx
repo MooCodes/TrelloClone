@@ -8,7 +8,6 @@ import {
   ListFormButtonContainer,
   StyledFontAwesomeIcon,
 } from "./ListForm.styles";
-import axios from "axios";
 import { socket } from "../../socket";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus, faX } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +15,7 @@ import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import { addList, updateNewListId } from "../../redux/slices/listsSlice";
 import { IList } from "../List/List";
 import useClickOutside from "../../hooks/useClickOutside";
+import ListsService from "../../services/lists";
 
 interface IListFormProps {
   boardId: string;
@@ -35,20 +35,8 @@ const ListForm = ({ boardId }: IListFormProps) => {
   });
 
   const mutation = useMutation({
-    mutationFn: () => {
-      return axios.post(
-        `http://localhost:5000/api/lists/${boardId}`,
-        { title },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem(
-              "trello-clone-token"
-            )}`,
-          },
-        }
-      );
-    },
-    onSuccess: ({ data }) => {
+    mutationFn: ListsService.createList,
+    onSuccess: (data) => {
       setTitle("");
 
       dispatch(updateNewListId(data));
@@ -76,7 +64,7 @@ const ListForm = ({ boardId }: IListFormProps) => {
 
     dispatch(addList(newList));
 
-    mutation.mutate();
+    mutation.mutate({ title, boardId });
 
     setIsFormVisible(false);
 
