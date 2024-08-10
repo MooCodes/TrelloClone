@@ -38,7 +38,6 @@ const Board = ({ _id, name }: IBoard) => {
       <BoardHeader>
         <BoardTitle>{name}</BoardTitle>
       </BoardHeader>
-
       <div style={{ position: "absolute", bottom: "10px", right: "80px" }}>
         <BoardGoButton onClick={() => navigate(`/boards/${_id}`)}>
           Go To Board

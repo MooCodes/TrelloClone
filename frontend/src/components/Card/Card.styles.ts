@@ -19,3 +19,25 @@ export const CardTitle = styled.h3`
   color: #b6c2cf;
   margin: 0;
 `;
+
+export const CardTitleInput = styled.textarea`
+  background-color: #22272b;
+  border: none;
+  font-size: 14px;
+  font-weight: normal;
+  color: #b6c2cf;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  resize: none;
+  padding: 0px;
+  height: fit-content;
+  field-sizing: content;
+
+  &:focus {
+    outline: 1px solid #66afe9;
+    outline-offset: 10px;
+    border-radius: 2px;
+  }
+`;

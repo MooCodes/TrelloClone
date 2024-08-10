@@ -58,7 +58,7 @@ export const ListTitleInput = styled.input`
   border-radius: 4px;
 
   &:focus {
-    outline-color: #3f4b5a;
+    outline: 1px solid #66afe9;
   }
 `;
 

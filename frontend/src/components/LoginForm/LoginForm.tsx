@@ -5,7 +5,6 @@ import LoginService from "../../services/login";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -36,12 +35,6 @@ const LoginForm = () => {
         Login
       </h2>
       <Form onSubmit={handleSubmit}>
-        <Input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
         <Input
           type="text"
           placeholder="Email"

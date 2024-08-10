@@ -19,4 +19,23 @@ const createCard = async ({
   return response.data;
 };
 
-export default { createCard };
+const updateCard = async ({
+  cardId,
+  title,
+}: {
+  cardId: string;
+  title: string;
+}) => {
+  const response = await axios.put(
+    `http://localhost:5000/api/cards/${cardId}`,
+    { title },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("trello-clone-token")}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export default { createCard, updateCard };

@@ -89,6 +89,22 @@ export const boardsSlice = createSlice({
         };
       });
     },
+    updateCardTitle: (state, action: PayloadAction<ICard>) => {
+      state.lists = state.lists.map((list) => {
+        if (list._id === action.payload.list) {
+          return {
+            ...list,
+            cards: list.cards.map((card) => {
+              if (card._id === action.payload._id) {
+                return action.payload;
+              }
+              return card;
+            }),
+          };
+        }
+        return list;
+      });
+    },
   },
 });
 
@@ -101,6 +117,7 @@ export const {
   updateNewCardId,
   updateCardsIndex,
   updateListTitle,
+  updateCardTitle,
 } = boardsSlice.actions;
 
 export default boardsSlice.reducer;
