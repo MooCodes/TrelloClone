@@ -10,7 +10,7 @@ import Card, { ICard } from "../Card/Card";
 import CardForm from "../CardForm/CardForm";
 import { Draggable, Droppable } from "@hello-pangea/dnd";
 import { faEllipsisH } from "@fortawesome/free-solid-svg-icons";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import ListActions from "../ListActions/ListActions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
@@ -31,6 +31,13 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
+
+  console.log("title", title);
+  console.log("newTitle", newTitle);
+
+  useEffect(() => {
+    setNewTitle(title);
+  }, [title]);
 
   const lists = useAppSelector((state) => state.lists.lists);
   const dispatch = useAppDispatch();

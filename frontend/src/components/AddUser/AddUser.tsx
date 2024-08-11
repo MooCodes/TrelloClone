@@ -20,22 +20,25 @@ const AddUserForm = ({ boardId }: IAddUserProps) => {
     console.log("email", email);
 
     addUser.mutate();
-
-    setEmail(""); // Clear the input after submission
   };
 
   const addUser = useMutation({
     mutationFn: () => {
-      const token = localStorage.getItem("trello-clone-token");
+      console.log("email", email);
       return axios.post(
         `http://localhost:5000/api/boards/${boardId}/users`,
         { email },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem(
+              "trello-clone-token"
+            )}`,
           },
         }
       );
+    },
+    onSuccess: () => {
+      setEmail("");
     },
   });
 

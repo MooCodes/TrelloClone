@@ -31,6 +31,10 @@ const Card = ({ title, _id, index, list }: ICard) => {
 
   useAutosizeTextArea(textAreaRef, newTitle);
 
+  useEffect(() => {
+    setNewTitle(title);
+  }, [title]);
+
   const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = event.target.value;
     setNewTitle(val);

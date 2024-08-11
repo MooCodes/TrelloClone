@@ -71,6 +71,9 @@ export const addUserToBoard = async (req: AuthRequest, res: Response) => {
   const boardId = req.params.boardId;
   const userEmailToAdd = req.body.email;
 
+  console.log("boardId", boardId);
+  console.log("userEmailToAdd", userEmailToAdd);
+
   console.log(boardId, userEmailToAdd);
 
   try {

@@ -21,8 +21,6 @@ connectDB();
 io.on("connection", (socket) => {
   console.log("a user connected, socket id: ", socket.id);
 
-  socket.join("test");
-
   socket.on("joinRoom", async (boardId) => {
     console.log("joining board: ", boardId);
     socket.join(boardId);
