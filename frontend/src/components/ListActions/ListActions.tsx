@@ -10,6 +10,8 @@ import {
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { socket } from "../../socket";
 import ListsService from "../../services/lists";
+import { useAppDispatch } from "../../hooks/redux";
+import { deleteList } from "../../redux/slices/listsSlice";
 
 interface IProps {
   listId: string;
@@ -19,6 +21,8 @@ interface IProps {
 }
 
 const ListActions = ({ listId, boardId, setShowDropdown, listRef }: IProps) => {
+  const dispatch = useAppDispatch();
+
   const listPosition = listRef.current?.getBoundingClientRect();
 
   const wrapperRef = useClickOutside((event) => {
@@ -44,6 +48,8 @@ const ListActions = ({ listId, boardId, setShowDropdown, listRef }: IProps) => {
   });
 
   const handleDelete = () => {
+    dispatch(deleteList(listId));
+
     deleteMutation.mutate(listId);
   };
 

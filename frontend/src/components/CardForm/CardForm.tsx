@@ -87,9 +87,10 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
 
     dispatch(addCardToList({ listId, card: newCard }));
 
-    setIsFormVisible(false);
+    const intermediateTitle = title;
+    setTitle("");
 
-    mutation.mutate({ title, listId });
+    mutation.mutate({ title: intermediateTitle, listId });
   };
 
   if (!isFormVisible) {
@@ -108,6 +109,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
           <CardTitleInput
             ref={textAreaRef}
             autoFocus
+            rows={2}
             placeholder="Enter a title for this card..."
             value={title}
             onChange={handleChange}

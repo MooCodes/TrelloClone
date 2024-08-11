@@ -15,9 +15,7 @@ import styled from "styled-components";
 // `;
 
 export const ListsContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
+  display: inline-flex;
   background-color: #7B3123;
   margin: 10px;
 `;
