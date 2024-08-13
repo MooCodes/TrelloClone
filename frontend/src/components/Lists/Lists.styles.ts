@@ -13,7 +13,6 @@ export const ListsContainer = styled.div`
   flex-direction: row;
   background-color: #7b3123;
   margin: 10px;
-  overflow-y: hidden;
   overflow-x: auto;
   white-space: nowrap;
   height: 85vh;

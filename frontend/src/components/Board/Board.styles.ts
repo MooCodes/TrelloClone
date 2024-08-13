@@ -9,7 +9,6 @@ export const BoardContainer = styled.div`
   padding: 10px;
   width: 250px;
   height: 100px;
-  cursor: pointer;
   margin-right: 20px;
 
   &:hover {

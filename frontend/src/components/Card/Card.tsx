@@ -1,14 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { CardContainer, CardTitle, CardTitleInput } from "./Card.styles";
+import {
+  CardContainer,
+  CardTitle,
+  CardTitleInput,
+  FaPencil,
+  FaTrash,
+  IconContainer,
+} from "./Card.styles";
 import { Draggable } from "@hello-pangea/dnd";
 import { useMutation } from "@tanstack/react-query";
 import useAutosizeTextArea from "../../hooks/useAutosizeTextArea";
 import CardsService from "../../services/cards";
 import { socket } from "../../socket";
 import { useAppDispatch } from "../../hooks/redux";
-import { updateCardTitle } from "../../redux/slices/listsSlice";
+import { deleteCard, updateCardTitle } from "../../redux/slices/listsSlice";
 import { useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
+import { faPencil, faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export interface ICard {
   _id: string;
@@ -20,6 +28,7 @@ export interface ICard {
 const Card = ({ title, _id, index, list }: ICard) => {
   const [editMode, setEditMode] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
+  const [isHovering, setIsHovering] = useState(false);
 
   const { boardId } = useParams();
 
@@ -35,12 +44,7 @@ const Card = ({ title, _id, index, list }: ICard) => {
     setNewTitle(title);
   }, [title]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const val = event.target.value;
-    setNewTitle(val);
-  };
-
-  const mutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: CardsService.updateCard,
     onSuccess: (data) => {
       console.log(" data", data);
@@ -52,6 +56,28 @@ const Card = ({ title, _id, index, list }: ICard) => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: CardsService.deleteCard,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
+      socket.emit("refreshLists", boardId);
+    },
+  });
+
+  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = event.target.value;
+    setNewTitle(val);
+  };
+
+  const handleDelete = () => {
+    setEditMode(false);
+
+    if (confirm("Delete this card?")) {
+      dispatch(deleteCard(_id));
+      deleteMutation.mutate(_id);
+    }
+  };
+
   return (
     <Draggable key={_id} draggableId={_id} index={index}>
       {(provided) => (
@@ -59,6 +85,8 @@ const Card = ({ title, _id, index, list }: ICard) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
         >
           {editMode ? (
             <CardTitleInput
@@ -88,7 +116,7 @@ const Card = ({ title, _id, index, list }: ICard) => {
                   // update the cards title on the client
                   dispatch(updateCardTitle(updatedCard));
 
-                  mutation.mutate({ cardId: _id, title: newTitle });
+                  updateMutation.mutate({ cardId: _id, title: newTitle });
                 }
               }}
               onFocus={(event) => {
@@ -101,7 +129,15 @@ const Card = ({ title, _id, index, list }: ICard) => {
               }}
             />
           ) : (
-            <CardTitle onClick={() => setEditMode(true)}>{title}</CardTitle>
+            <CardTitle>
+              {title}
+              {isHovering && (
+                <IconContainer>
+                  <FaTrash onClick={handleDelete} icon={faTrash} />
+                  <FaPencil onClick={() => setEditMode(true)} icon={faPencil} />
+                </IconContainer>
+              )}
+            </CardTitle>
           )}
         </CardContainer>
       )}

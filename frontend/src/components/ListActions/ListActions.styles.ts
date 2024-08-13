@@ -12,6 +12,7 @@ export const ListActionsContainer = styled.div`
   display: flex;
   flex-direction: column;
   right: 0;
+  z-index: 10;
 `;
 
 export const ListActionsHeader = styled.div`

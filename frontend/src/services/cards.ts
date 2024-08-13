@@ -38,4 +38,16 @@ const updateCard = async ({
   return response.data;
 };
 
-export default { createCard, updateCard };
+const deleteCard = async (cardId: string) => {
+  const response = await axios.delete(
+    `http://localhost:5000/api/cards/${cardId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("trello-clone-token")}`,
+      },
+    }
+  );
+  return response.data;
+};
+
+export default { createCard, updateCard, deleteCard };

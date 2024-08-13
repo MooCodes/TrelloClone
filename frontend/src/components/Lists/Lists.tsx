@@ -59,8 +59,6 @@ const Lists = () => {
   const listMoveMutation = useMutation({
     mutationFn: ListsService.moveList,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
-
       socket.emit("refreshLists", boardId);
     },
   });
@@ -68,17 +66,13 @@ const Lists = () => {
   const cardMoveMutation = useMutation({
     mutationFn: ListsService.moveCard,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
-
       socket.emit("refreshLists", boardId);
     },
   });
 
   const cardMoveToListMutation = useMutation({
     mutationFn: ListsService.moveCardToList,
-    onSuccess: ({ data }) => {
-      console.log("data", data);
-
+    onSuccess: () => {
       socket.emit("refreshLists", boardId);
     },
   });
@@ -134,8 +128,6 @@ const Lists = () => {
 
       dispatch(setLists(reorderedLists));
       dispatch(updateListsIndex());
-
-      console.log("lists", lists);
 
       listMoveMutation.mutate({
         listId: sourceList._id,

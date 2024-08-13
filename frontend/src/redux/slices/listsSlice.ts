@@ -108,6 +108,14 @@ export const boardsSlice = createSlice({
     deleteList: (state, action: PayloadAction<string>) => {
       state.lists = state.lists.filter((list) => list._id !== action.payload);
     },
+    deleteCard: (state, action: PayloadAction<string>) => {
+      state.lists = state.lists.map((list) => {
+        return {
+          ...list,
+          cards: list.cards.filter((card) => card._id !== action.payload),
+        };
+      });
+    },
   },
 });
 
@@ -122,6 +130,7 @@ export const {
   updateListTitle,
   updateCardTitle,
   deleteList,
+  deleteCard,
 } = boardsSlice.actions;
 
 export default boardsSlice.reducer;

@@ -10,6 +10,9 @@ export const ListContainer = styled.div`
   width: 250px;
   margin-right: 20px;
   margin-bottom: 20px;
+
+  word-wrap: break-word;
+  white-space: pre-line;
 `;
 
 export const ListHeader = styled.div`
@@ -38,7 +41,7 @@ export const ListTitle = styled.h3`
   font-weight: bold;
   color: #b6c2cf;
   margin: 0;
-  width: 100%;
+  width: 80%;
   padding: 15px 10px 10px 20px;
 `;
 
