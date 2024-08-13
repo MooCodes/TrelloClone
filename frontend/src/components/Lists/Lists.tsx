@@ -58,10 +58,7 @@ const Lists = () => {
 
   const listMoveMutation = useMutation({
     mutationFn: ListsService.moveList,
-    onSuccess: ({ data }) => {
-      console.log("data", data);
-      console.log("updating the react query cache");
-
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["listsAndBoard", boardId] });
 
       socket.emit("refreshLists", boardId);
@@ -225,13 +222,11 @@ const Lists = () => {
     }
   };
 
-  console.log("lists", lists);
-
   return (
     <div
       unselectable="on"
       className="unselectable"
-      style={{ backgroundColor: "#7B3123" }}
+      style={{ backgroundColor: "#7B3123", width: "100%" }}
     >
       <ListsHeader>
         <BoardName>{boardFromServer.name}</BoardName>

@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from "styled-components";
 
 export const FormContainer = styled.div`
   display: flex;
@@ -44,4 +44,4 @@ export const ButtonContainer = styled.div`
   gap: 10px;
   justify-content: center;
   margin-top: 20px;
-`
+`;

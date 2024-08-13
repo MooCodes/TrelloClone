@@ -10,7 +10,7 @@ export const CardFormContainer = styled.form`
 export const CardTitleContainer = styled.div`
   background-color: #22272b;
   border-radius: 10px;
-  padding: 10px;
+  padding: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;

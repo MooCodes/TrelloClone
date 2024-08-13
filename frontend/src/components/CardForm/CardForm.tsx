@@ -75,6 +75,7 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
     }
 
     if (!title) {
+      setIsFormVisible(false);
       return;
     }
 
@@ -109,7 +110,6 @@ const CardForm = ({ listId, boardId }: ICardFormProps) => {
           <CardTitleInput
             ref={textAreaRef}
             autoFocus
-            rows={2}
             placeholder="Enter a title for this card..."
             value={title}
             onChange={handleChange}

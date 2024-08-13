@@ -1,15 +1,15 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FormContainer,
   Form,
   Input,
   Button,
   ButtonContainer,
-} from "./LoginForm.styles";
-import { useNavigate } from "react-router-dom";
-import LoginService from "../../services/login";
+} from "./SignupForm.styles";
+import SignupService from "../../services/signup";
 
-const LoginForm = () => {
+const SignupForm = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,7 +18,7 @@ const LoginForm = () => {
     event.preventDefault();
 
     try {
-      const response = await LoginService.login({
+      const response = await SignupService.signup({
         email,
         password,
       });
@@ -27,7 +27,7 @@ const LoginForm = () => {
 
       console.log(token);
 
-      LoginService.setToken(token);
+      SignupService.setToken(token);
 
       navigate(`/boards`);
     } catch (error) {
@@ -38,7 +38,7 @@ const LoginForm = () => {
   return (
     <FormContainer>
       <h2 style={{ color: "#fff", fontSize: "24px", marginBottom: "20px" }}>
-        Login
+        Sign Up
       </h2>
       <Form onSubmit={handleSubmit}>
         <Input
@@ -54,12 +54,11 @@ const LoginForm = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
         <ButtonContainer>
-          <Button type="submit">Log In</Button>
-          <Button onClick={() => navigate("/signup")}>Sign Up</Button>
+          <Button type="submit">Sign Up</Button>
         </ButtonContainer>
       </Form>
     </FormContainer>
   );
 };
 
-export default LoginForm;
+export default SignupForm;

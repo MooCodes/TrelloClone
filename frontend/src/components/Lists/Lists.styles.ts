@@ -1,29 +1,28 @@
 import styled from "styled-components";
 
 // export const ListsContainer = styled.div`
-//   display: flex;
-//   gap: 20px;
-//   flex-direction: row;
-//   flex-wrap: wrap;
+//   display: inline-flex;
 //   align-items: flex-start;
 //   width: 100%;
 //   padding: 20px;
-//   background-color: #f8f9fa;
-//   border: 1px solid #ddd;
 //   border-radius: 3px;
-//   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 // `;
 
 export const ListsContainer = styled.div`
-  display: inline-flex;
-  background-color: #7B3123;
+  display: flex;
+  flex-direction: row;
+  background-color: #7b3123;
   margin: 10px;
+  overflow-y: hidden;
+  overflow-x: auto;
+  white-space: nowrap;
+  height: 85vh;
 `;
 
 export const ListsHeader = styled.div`
   display: flex;
   align-items: center;
-  background-color: #5E251B;
+  background-color: #5e251b;
   gap: 20px;
 `;
 
@@ -31,7 +30,7 @@ export const ListsInviteButton = styled.button`
   background-color: transparent;
   border: none;
   cursor: pointer;
-  color: #3869D4;
+  color: #3869d4;
   font-size: 18px;
   font-weight: 600;
   margin-right: 20px;

@@ -7,6 +7,7 @@ import "@fontsource/roboto";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { socket } from "./socket";
 import { useEffect } from "react";
+import SignupForm from "./components/SignupForm/SignupForm";
 
 const GlobalStyles = createGlobalStyle`
   * {
@@ -57,6 +58,7 @@ function App() {
           <Route path="/" element={<LoginForm />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/boards/:boardId" element={<Lists />} />
+          <Route path="/signup" element={<SignupForm />} />
         </Routes>
       </Router>
     </QueryClientProvider>

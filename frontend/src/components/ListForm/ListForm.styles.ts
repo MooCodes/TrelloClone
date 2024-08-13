@@ -9,7 +9,8 @@ export const ListFormContainer = styled.form`
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 10px;
   width: 250px;
-  height: 100%;
+  min-width: 250px;
+  max-width: 250px;
 `;
 
 export const ListTitleInput = styled.input`
@@ -56,7 +57,8 @@ export const ShowListForm = styled.div`
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 10px;
   width: 250px;
-  height: 100%;
+  min-width: 250px;
+  height: fit-content;
   cursor: pointer;
 
   span {

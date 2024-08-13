@@ -7,11 +7,21 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const { username, email, password } = req.body;
 
+    console.log(username, email, password);
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
+    const user = new User({ username: "test", email, password: hashedPassword });
 
     const savedUser = await user.save();
-    res.status(201).json(savedUser);
+
+    const userForToken = {
+      email: savedUser.email,
+      id: savedUser._id,
+    };
+
+    const token = jwt.sign(userForToken, process.env.JWT_SECRET!);
+
+    res.status(201).json({ user: savedUser, token });
   } catch (error) {
     if (error instanceof Error) {
       res.status(500).json({ message: error.message });
@@ -37,7 +47,7 @@ export const loginUser = async (req: Request, res: Response) => {
     const userForToken = {
       email: user.email,
       id: user._id,
-    }
+    };
 
     const token = jwt.sign(userForToken, process.env.JWT_SECRET!);
 

@@ -81,7 +81,7 @@ const ListForm = ({ boardId }: IListFormProps) => {
   }
 
   return (
-    <div style={{ height: "100%" }} ref={wrapperRef}>
+    <div ref={wrapperRef}>
       <ListFormContainer onSubmit={handleSubmit}>
         <ListTitleInput
           autoFocus

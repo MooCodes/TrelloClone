@@ -32,9 +32,6 @@ const List = ({ _id, title, index, cards, boardId }: IList) => {
   const [editMode, setEditMode] = useState(false);
   const [newTitle, setNewTitle] = useState(title);
 
-  console.log("title", title);
-  console.log("newTitle", newTitle);
-
   useEffect(() => {
     setNewTitle(title);
   }, [title]);
