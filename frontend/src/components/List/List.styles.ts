@@ -24,7 +24,7 @@ export const ListHeader = styled.div`
 
 export const StyledEllipsis = styled(FontAwesomeIcon)`
   color: #b6c2cf;
-  margin-right: 10px;
+  margin-right: 5px;
   margin-top: 5px;
   padding: 10px;
   cursor: pointer;
@@ -59,7 +59,7 @@ export const ListTitleInput = styled.input`
   border-radius: 4px;
 
   &:focus {
-    outline: 1px solid #66afe9;
+    outline: 2px solid #66afe9;
   }
 `;
 
