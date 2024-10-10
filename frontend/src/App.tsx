@@ -55,10 +55,11 @@ function App() {
       <GlobalStyles />
       <Router>
         <Routes>
-          <Route path="/" element={<LoginForm />} />
+          <Route path="/" element={<SignupForm />} />
           <Route path="/boards" element={<Boards />} />
           <Route path="/boards/:boardId" element={<Lists />} />
           <Route path="/signup" element={<SignupForm />} />
+          <Route path="/login" element={<LoginForm />} />
         </Routes>
       </Router>
     </QueryClientProvider>

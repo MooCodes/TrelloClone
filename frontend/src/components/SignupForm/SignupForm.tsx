@@ -55,6 +55,9 @@ const SignupForm = () => {
         />
         <ButtonContainer>
           <Button type="submit">Sign Up</Button>
+          <Button onClick={() => navigate("/login")}>
+            Already have an account?
+          </Button>
         </ButtonContainer>
       </Form>
     </FormContainer>

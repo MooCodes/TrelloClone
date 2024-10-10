@@ -13,7 +13,7 @@ export const Form = styled.form`
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 300px;
+  width: 400px;
   padding: 20px;
   background-color: #fff;
   border-radius: 8px;
